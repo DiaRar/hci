@@ -2,6 +2,12 @@ import { ArrowRight, Compass, Shield, UserRound } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
+
 import { AppFrame } from '../components/AppFrame';
 import { Avatar } from '../components/Avatar';
 import { HERO_TAGLINES, HIGHLIGHT_BADGES, INTEREST_OPTIONS } from '../lib/constants';
@@ -12,7 +18,7 @@ export function AuthPage() {
   const { authenticate, currentUser, users } = useBubbleStore();
   const [displayName, setDisplayName] = useState('');
   const [nearbyDiscoveryEnabled, setNearbyDiscoveryEnabled] = useState(true);
-  const [selectedInterests, setSelectedInterests] = useState<string[]>(['Coffee', 'Tennis']);
+  const [selectedInterests, setSelectedInterests] = useState<string[]>(['Tennis', 'Running']);
 
   useEffect(() => {
     if (currentUser) {
@@ -42,35 +48,35 @@ export function AuthPage() {
   return (
     <AppFrame showNav={false}>
       <main className="screen screen--auth">
-        <section className="hero-card hero-card--auth">
+        <Card className="hero-card hero-card--auth">
           <div className="hero-card__topline">
-            <span className="hero-pill">
+            <Badge className="hero-pill">
               <Compass size={14} />
-              Nearby bubbles
-            </span>
-            <span className="hero-pill hero-pill--subtle">
+              Nearby sports
+            </Badge>
+            <Badge variant="secondary" className="hero-pill hero-pill--subtle">
               <Shield size={14} />
               Text-only safety demo
-            </span>
+            </Badge>
           </div>
-          <h1>Plans near you, without guessing who will actually show up.</h1>
+          <h1>Sports near you, without guessing who will actually show up.</h1>
           <p>{HERO_TAGLINES[0]}</p>
           <div className="badge-row">
             {HIGHLIGHT_BADGES.map((badge) => (
-              <span key={badge} className="soft-badge">
+              <Badge key={badge} variant="outline" className="soft-badge">
                 {badge}
-              </span>
+              </Badge>
             ))}
           </div>
-        </section>
+        </Card>
 
-        <section className="glass-card auth-card">
+        <Card className="auth-card">
           <div className="section-title">
             <UserRound size={16} />
             <span>Jump in fast</span>
           </div>
           <p className="helper-copy">
-            Use a demo profile or create one with a visible display name so people know who is joining.
+            Use a demo profile or create one with a visible display name so people know who is joining the session.
           </p>
 
           <div className="quick-user-list">
@@ -99,10 +105,9 @@ export function AuthPage() {
           <form className="auth-form" onSubmit={handleSubmit}>
             <label className="field">
               <span className="field__label">Display name</span>
-              <input
-                className="text-field"
+              <Input
                 type="text"
-                placeholder="e.g. Sunday Tennis Alex"
+                placeholder="e.g. Noor"
                 value={displayName}
                 onChange={(event) => setDisplayName(event.target.value)}
                 required
@@ -112,18 +117,20 @@ export function AuthPage() {
             <div className="field">
               <div className="field__label-row">
                 <span className="field__label">Interests</span>
-                <span className="field__hint">Optional, but it improves your event feed.</span>
+                <span className="field__hint">Optional, but it improves your session feed.</span>
               </div>
               <div className="chip-grid">
                 {INTEREST_OPTIONS.map((interest) => (
-                  <button
+                  <Button
                     key={interest}
-                    className={`pill-button${selectedInterests.includes(interest) ? ' is-active' : ''}`}
                     type="button"
+                    variant={selectedInterests.includes(interest) ? 'default' : 'outline'}
+                    size="sm"
+                    className="pill-button"
                     onClick={() => toggleInterest(interest)}
                   >
                     {interest}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>
@@ -131,22 +138,20 @@ export function AuthPage() {
             <label className="switch-card">
               <div>
                 <span className="field__label">Enable nearby discovery</span>
-                <p className="field__hint">Open map mode keeps event pins visible in the discover feed.</p>
+                <p className="field__hint">Open map mode keeps nearby sports sessions visible in your discover feed.</p>
               </div>
-              <input
-                type="checkbox"
+              <Switch
                 checked={nearbyDiscoveryEnabled}
-                onChange={(event) => setNearbyDiscoveryEnabled(event.target.checked)}
+                onCheckedChange={setNearbyDiscoveryEnabled}
               />
-              <span className="switch-card__toggle" aria-hidden="true" />
             </label>
 
-            <button className="primary-button" type="submit">
+            <Button className="primary-button" type="submit">
               Enter Bubbleverse
               <ArrowRight size={16} />
-            </button>
+            </Button>
           </form>
-        </section>
+        </Card>
       </main>
     </AppFrame>
   );

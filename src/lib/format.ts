@@ -30,7 +30,7 @@ export function formatCurrency(price: number) {
     return 'Free';
   }
 
-  return `${price} lei`;
+  return `€${price}`;
 }
 
 export function formatDistanceKm(distanceKm: number) {

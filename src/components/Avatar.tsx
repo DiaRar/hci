@@ -1,5 +1,12 @@
 import type { CSSProperties } from 'react';
 
+import {
+  Avatar as UiAvatar,
+  AvatarFallback,
+  AvatarGroup,
+  AvatarGroupCount,
+} from '@/components/ui/avatar';
+
 import { getInitials } from '../lib/format';
 import type { User } from '../types';
 
@@ -10,14 +17,17 @@ type AvatarProps = {
 
 export function Avatar({ user, size = 'md' }: AvatarProps) {
   return (
-    <span
+    <UiAvatar
+      size={size === 'lg' ? 'lg' : size === 'sm' ? 'sm' : 'default'}
       className={`avatar avatar--${size}`}
       style={{ '--avatar-color': user.avatarPreset } as CSSProperties}
       aria-label={user.displayName}
       title={user.displayName}
     >
-      {getInitials(user.displayName)}
-    </span>
+      <AvatarFallback className="avatar__fallback">
+        {getInitials(user.displayName)}
+      </AvatarFallback>
+    </UiAvatar>
   );
 }
 
@@ -31,11 +41,15 @@ export function AvatarStack({ users, limit = 3 }: AvatarStackProps) {
   const extraCount = Math.max(users.length - visibleUsers.length, 0);
 
   return (
-    <div className="avatar-stack">
+    <AvatarGroup className="avatar-stack">
       {visibleUsers.map((user) => (
         <Avatar key={user.id} user={user} size="sm" />
       ))}
-      {extraCount > 0 ? <span className="avatar avatar--sm avatar--ghost">+{extraCount}</span> : null}
-    </div>
+      {extraCount > 0 ? (
+        <AvatarGroupCount className="avatar avatar--sm avatar--ghost">
+          +{extraCount}
+        </AvatarGroupCount>
+      ) : null}
+    </AvatarGroup>
   );
 }

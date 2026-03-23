@@ -2,6 +2,9 @@ import { ChevronLeft } from 'lucide-react';
 import type { PropsWithChildren, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 
+import { buttonVariants } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+
 import { BottomNav } from './BottomNav';
 
 type AppFrameProps = PropsWithChildren<{
@@ -35,11 +38,18 @@ export function PageHeader({ title, subtitle, backTo, action }: PageHeaderProps)
     <header className="page-header">
       <div className="page-header__main">
         {backTo ? (
-          <Link className="icon-button icon-button--ghost" to={backTo} aria-label="Go back">
+          <Link
+            className={cn(
+              buttonVariants({ variant: 'outline', size: 'icon' }),
+              'page-header__back',
+            )}
+            to={backTo}
+            aria-label="Go back"
+          >
             <ChevronLeft size={18} />
           </Link>
         ) : (
-          <span className="icon-button icon-button--ghost icon-button--placeholder" aria-hidden="true" />
+          <span className="page-header__back page-header__back--placeholder" aria-hidden="true" />
         )}
         <div>
           <p className="eyebrow">Bubbleverse</p>

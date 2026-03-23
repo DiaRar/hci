@@ -10,6 +10,17 @@ import {
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
+import { Badge } from '@/components/ui/badge';
+import { Button, buttonVariants } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import {
+  NativeSelect,
+  NativeSelectOption,
+} from '@/components/ui/native-select';
+import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
+import { cn } from '@/lib/utils';
+
 import { AppFrame, PageHeader } from '../components/AppFrame';
 import { Avatar } from '../components/Avatar';
 import { EventMap } from '../components/EventMap';
@@ -53,17 +64,20 @@ export function EventPage() {
       <AppFrame>
         <main className="screen">
           <PageHeader
-            title="Bubble missing"
-            subtitle="This event may have been removed from the mock store."
+            title="Session missing"
+            subtitle="This session may have been removed from the mock store."
             backTo="/discover"
           />
-          <div className="glass-card empty-state">
-            <h2>That bubble is gone.</h2>
-            <p>If the host deleted their profile, hosted events disappear too.</p>
-            <Link className="primary-button primary-button--compact" to="/discover">
+          <Card className="empty-state">
+            <h2>That session is gone.</h2>
+            <p>If the host deleted their profile, hosted sessions disappear too.</p>
+            <Link
+              className={cn(buttonVariants({ size: 'sm' }), 'primary-button')}
+              to="/discover"
+            >
               Back to discover
             </Link>
-          </div>
+          </Card>
         </main>
       </AppFrame>
     );
@@ -113,12 +127,12 @@ export function EventPage() {
     <AppFrame>
       <main className="screen">
         <PageHeader
-          title="Bubble details"
-          subtitle="Participants, timing, cost, and safety entry points stay visible before you join chat."
+          title="Session details"
+          subtitle="Players, timing, cost, and safety entry points stay visible before you join chat."
           backTo="/discover"
         />
 
-        <section className="hero-card hero-card--event">
+        <Card className="hero-card hero-card--event">
           <div className="hero-card__halo" style={{ background: category.glow }} />
           <div
             className="hero-card__bubble-icon"
@@ -126,47 +140,47 @@ export function EventPage() {
           >
             {category.emoji}
           </div>
-          <span
+          <Badge
             className="category-token"
             style={{ background: category.glow, color: category.accent }}
           >
             <span>{category.emoji}</span>
             {category.label}
-          </span>
+          </Badge>
           <h1>{event.title}</h1>
           <p>{event.description}</p>
           <div className="hero-card__metrics">
-            <span className="soft-badge">
+            <Badge variant="outline" className="soft-badge">
               <Users size={12} />
-              {event.attendeeIds.length} joining
-            </span>
-            <span className="soft-badge">
+              {event.attendeeIds.length} players
+            </Badge>
+            <Badge variant="outline" className="soft-badge">
               <BellRing size={12} />
               {formatEventWindow(event.startTime, event.durationMinutes)}
-            </span>
+            </Badge>
             {event.womenOnly ? (
-              <span className="soft-badge">
+              <Badge variant="outline" className="soft-badge">
                 <ShieldAlert size={12} />
                 Women-only
-              </span>
+              </Badge>
             ) : null}
           </div>
-        </section>
+        </Card>
 
         {hostBlocked ? (
-          <div className="glass-card notice-card notice-card--warning">
+          <Card className="notice-card notice-card--warning">
             <TriangleAlert size={16} />
             <div>
               <h3>Host blocked</h3>
               <p>
-                You blocked this host from your profile. The event remains visible here
+                You blocked this host from your profile. The session remains visible here
                 because you opened it directly.
               </p>
             </div>
-          </div>
+          </Card>
         ) : null}
 
-        <section className="glass-card">
+        <Card>
           <div className="section-title">
             <Users size={16} />
             <span>Who is coming</span>
@@ -179,18 +193,20 @@ export function EventPage() {
                 to={`/profile/${participant.id}`}
               >
                 <Avatar user={participant} size="lg" />
-                <strong>{participant.displayName}</strong>
-                <span>
-                  {participant.id === host?.id
-                    ? 'Host'
-                    : ATTENDANCE_LABELS[event.attendanceStatuses[participant.id]]}
-                </span>
+                <div className="person-card__copy">
+                  <strong>{participant.displayName}</strong>
+                  <span>
+                    {participant.id === host?.id
+                      ? 'Host'
+                      : ATTENDANCE_LABELS[event.attendanceStatuses[participant.id]]}
+                  </span>
+                </div>
               </Link>
             ))}
           </div>
-        </section>
+        </Card>
 
-        <section className="glass-card stat-grid">
+        <Card className="stat-grid">
           <div className="stat-card">
             <span className="eyebrow">Price</span>
             <strong>{formatCurrency(event.price)}</strong>
@@ -207,9 +223,9 @@ export function EventPage() {
             <span className="eyebrow">Attendance</span>
             <strong>{event.attendanceCounts.here} here now</strong>
           </div>
-        </section>
+        </Card>
 
-        <section className="glass-card">
+        <Card>
           <div className="section-title">
             <MapPin size={16} />
             <span>Location</span>
@@ -223,14 +239,22 @@ export function EventPage() {
             onSelectEvent={() => undefined}
           />
           <div className="inline-actions">
-            <span className="soft-badge">{event.location.label}</span>
-            <Link className="secondary-button" to={`/discover?focus=${event.id}`}>
+            <Badge variant="outline" className="soft-badge">
+              {event.location.label}
+            </Badge>
+            <Link
+              className={cn(
+                buttonVariants({ variant: 'outline', size: 'sm' }),
+                'secondary-button',
+              )}
+              to={`/discover?focus=${event.id}`}
+            >
               View on map
             </Link>
           </div>
-        </section>
+        </Card>
 
-        <section className="glass-card">
+        <Card>
           <div className="section-title">
             <Lock size={16} />
             <span>Attendance & chat</span>
@@ -238,14 +262,16 @@ export function EventPage() {
           <div className="status-selector">
             {(Object.entries(ATTENDANCE_LABELS) as Array<[AttendanceStatus, string]>).map(
               ([status, label]) => (
-                <button
+                <Button
                   key={status}
-                  className={`status-button${currentStatus === status ? ' is-active' : ''}`}
                   type="button"
+                  variant={currentStatus === status ? 'default' : 'outline'}
+                  size="sm"
+                  className="status-button"
                   onClick={() => handleAttendance(status)}
                 >
                   {label}
-                </button>
+                </Button>
               ),
             )}
           </div>
@@ -254,44 +280,43 @@ export function EventPage() {
               <span className="field__label">Reminder</span>
               <p className="field__hint">Mock local notification toggle for event start.</p>
             </div>
-            <input
-              type="checkbox"
+            <Switch
               checked={reminderEnabled}
-              onChange={() => toggleReminder(event.id)}
+              onCheckedChange={() => toggleReminder(event.id)}
             />
-            <span className="switch-card__toggle" aria-hidden="true" />
           </label>
           <div className="button-row">
-            <button className="primary-button" type="button" onClick={handleChatEntry}>
-              {isAttending ? 'Open chat' : 'Join event & chat'}
-            </button>
+            <Button className="primary-button" type="button" onClick={handleChatEntry}>
+              {isAttending ? 'Open chat' : 'Join session & chat'}
+            </Button>
             {!isAttending ? (
-              <button
+              <Button
+                variant="outline"
                 className="secondary-button"
                 type="button"
                 onClick={() => joinEvent(event.id)}
               >
-                Join without chatting
-              </button>
+                Join without chat
+              </Button>
             ) : null}
           </div>
-        </section>
+        </Card>
 
-        <section className="glass-card">
+        <Card>
           <div className="section-title">
             <ShieldAlert size={16} />
-            <span>Community notes</span>
+            <span>Session setup</span>
           </div>
           <div className="chip-grid">
             {event.requiredEquipment.map((item) => (
-              <span key={item} className="soft-badge">
+              <Badge key={item} variant="outline" className="soft-badge">
                 {item}
-              </span>
+              </Badge>
             ))}
             {event.extraFacilities.map((item) => (
-              <span key={item} className="soft-badge soft-badge--warm">
+              <Badge key={item} variant="secondary" className="soft-badge soft-badge--warm">
                 {item}
-              </span>
+              </Badge>
             ))}
           </div>
           {host ? (
@@ -307,7 +332,8 @@ export function EventPage() {
             </div>
           ) : null}
           <div className="button-row">
-            <button
+            <Button
+              variant="outline"
               className="secondary-button"
               type="button"
               onClick={() =>
@@ -315,11 +341,12 @@ export function EventPage() {
               }
             >
               <Flag size={14} />
-              Report event
-            </button>
+              Report session
+            </Button>
             {host ? (
               <>
-                <button
+                <Button
+                  variant="outline"
                   className="secondary-button"
                   type="button"
                   onClick={() =>
@@ -331,18 +358,19 @@ export function EventPage() {
                   }
                 >
                   Report host
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="outline"
                   className="secondary-button"
                   type="button"
                   onClick={() => blockUser(host.id)}
                 >
                   Block host
-                </button>
+                </Button>
               </>
             ) : null}
           </div>
-        </section>
+        </Card>
 
         <Modal
           open={Boolean(reportTarget)}
@@ -351,41 +379,41 @@ export function EventPage() {
           onClose={() => setReportTarget(null)}
           footer={
             <>
-              <button
+              <Button
+                variant="outline"
                 className="secondary-button"
                 type="button"
                 onClick={() => setReportTarget(null)}
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 className="primary-button primary-button--compact"
                 type="button"
                 onClick={handleSubmitReport}
               >
                 Submit report
-              </button>
+              </Button>
             </>
           }
         >
           <label className="field">
             <span className="field__label">Reason</span>
-            <select
-              className="select-field"
+            <NativeSelect
               value={reportReason}
               onChange={(event) => setReportReason(event.target.value)}
             >
               {REPORT_REASONS.map((reason) => (
-                <option key={reason} value={reason}>
+                <NativeSelectOption key={reason} value={reason}>
                   {reason}
-                </option>
+                </NativeSelectOption>
               ))}
-            </select>
+            </NativeSelect>
           </label>
           <label className="field">
             <span className="field__label">Notes</span>
-            <textarea
-              className="text-field text-field--textarea"
+            <Textarea
+              className="text-field--textarea"
               rows={4}
               value={reportNotes}
               onChange={(event) => setReportNotes(event.target.value)}

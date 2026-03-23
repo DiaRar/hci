@@ -20,7 +20,7 @@ import type {
   User,
 } from '../types';
 
-const STORAGE_KEY = 'bubbleverse-demo-v1';
+const STORAGE_KEY = 'bubbleverse-demo-v4';
 const avatarPalette = ['#8d5f48', '#efab47', '#4eb5a6', '#b4d63d', '#6b5cff', '#ff8b6d', '#5c9ded'];
 
 type BubbleStoreValue = BubbleState & {
@@ -77,8 +77,8 @@ export function BubbleStoreProvider({ children }: PropsWithChildren) {
         const newUser: User = {
           id,
           displayName: normalizedName,
-          bio: 'New around here. Looking for a first low-pressure bubble.',
-          interests: payload.interests.length > 0 ? payload.interests : ['Coffee'],
+          bio: 'New around here. Looking for a first low-pressure sports session.',
+          interests: payload.interests.length > 0 ? payload.interests : ['Running'],
           languages: ['English'],
           nearbyDiscoveryEnabled: payload.nearbyDiscoveryEnabled,
           avatarPreset: avatarPalette[previous.users.length % avatarPalette.length],
@@ -133,7 +133,7 @@ export function BubbleStoreProvider({ children }: PropsWithChildren) {
         attendanceCounts: recalculateAttendanceCounts(hostStatus),
         chatId: `chat-${eventId}`,
         reminderUserIds: [state.currentUserId],
-        safetyNote: 'Location is shared openly in this demo map mode.',
+        safetyNote: 'Exact court, field, or meetup point stays visible on the map in this demo.',
       };
 
       setState((previous) => ({
@@ -145,7 +145,7 @@ export function BubbleStoreProvider({ children }: PropsWithChildren) {
             id: createId('message'),
             eventId,
             senderId: state.currentUserId!,
-            text: 'Bubble launched. Share any last-minute details here.',
+            text: 'Session launched. Share warm-up details or last-minute changes here.',
             createdAt: new Date().toISOString(),
             demoModerationState: 'clean',
           },

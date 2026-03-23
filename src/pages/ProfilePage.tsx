@@ -2,6 +2,18 @@ import { Download, ShieldAlert, Trash2, UserPlus } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
+import { Badge } from '@/components/ui/badge';
+import { Button, buttonVariants } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import {
+  NativeSelect,
+  NativeSelectOption,
+} from '@/components/ui/native-select';
+import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
+import { cn } from '@/lib/utils';
+
 import { AppFrame, PageHeader } from '../components/AppFrame';
 import { Avatar } from '../components/Avatar';
 import { EventCard } from '../components/EventCard';
@@ -45,11 +57,14 @@ export function ProfilePage() {
             subtitle="This user may have deleted their demo account."
             backTo="/discover"
           />
-          <div className="glass-card empty-state">
-            <Link className="primary-button primary-button--compact" to="/discover">
+          <Card className="empty-state">
+            <Link
+              className={cn(buttonVariants({ size: 'sm' }), 'primary-button')}
+              to="/discover"
+            >
               Back to discover
             </Link>
-          </div>
+          </Card>
         </main>
       </AppFrame>
     );
@@ -100,23 +115,27 @@ export function ProfilePage() {
           subtitle={
             isOwnProfile
               ? 'Edit how you appear in the app and manage your mock GDPR actions.'
-              : 'See who this person is before you join their event.'
+              : 'See who this person is before you join their session.'
           }
           backTo="/discover"
         />
 
-        <section className="hero-card hero-card--profile">
+        <Card className="hero-card hero-card--profile">
           <Avatar user={profile} size="lg" />
           <h1>{profile.displayName}</h1>
           <p>{profile.bio}</p>
           <div className="hero-card__metrics">
-            <span className="soft-badge">{profile.interests.length} interests</span>
-            <span className="soft-badge">{profile.friends.length} friends</span>
-            <span className="soft-badge">
+            <Badge variant="outline" className="soft-badge">
+              {profile.interests.length} interests
+            </Badge>
+            <Badge variant="outline" className="soft-badge">
+              {profile.friends.length} friends
+            </Badge>
+            <Badge variant="outline" className="soft-badge">
               {profile.trustFlags.noShowStrikes} no-show strikes
-            </span>
+            </Badge>
           </div>
-        </section>
+        </Card>
 
         {isOwnProfile ? (
           <div className="stack">
@@ -126,39 +145,46 @@ export function ProfilePage() {
               onSave={updateProfile}
             />
 
-            <section className="glass-card">
+            <Card>
               <div className="section-title">
                 <ShieldAlert size={16} />
                 <span>Data rights</span>
               </div>
               <div className="button-row">
-                <button className="secondary-button" type="button" onClick={handleExport}>
+                <Button
+                  variant="outline"
+                  className="secondary-button"
+                  type="button"
+                  onClick={handleExport}
+                >
                   <Download size={14} />
                   Export my data
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="outline"
                   className="secondary-button"
                   type="button"
                   onClick={() => setDeleteOpen(true)}
                 >
                   <Trash2 size={14} />
                   Delete account
-                </button>
+                </Button>
               </div>
-            </section>
+            </Card>
           </div>
         ) : (
-          <section className="glass-card">
+          <Card>
             <div className="button-row">
-              <button
+              <Button
                 className="primary-button primary-button--compact"
                 type="button"
                 onClick={() => toggleFriend(profile.id)}
               >
                 <UserPlus size={14} />
                 {isFriend ? 'Remove friend' : 'Add friend'}
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="outline"
                 className="secondary-button"
                 type="button"
                 onClick={() =>
@@ -170,28 +196,29 @@ export function ProfilePage() {
                 }
               >
                 Report user
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="outline"
                 className="secondary-button"
                 type="button"
                 onClick={() => blockUser(profile.id)}
               >
                 Block user
-              </button>
+              </Button>
             </div>
             <div className="chip-grid">
               {profile.languages.map((language) => (
-                <span key={language} className="soft-badge">
+                <Badge key={language} variant="outline" className="soft-badge">
                   {language}
-                </span>
+                </Badge>
               ))}
               {profile.interests.map((interest) => (
-                <span key={interest} className="soft-badge soft-badge--warm">
+                <Badge key={interest} variant="secondary" className="soft-badge soft-badge--warm">
                   {interest}
-                </span>
+                </Badge>
               ))}
             </div>
-          </section>
+          </Card>
         )}
 
         {hostedEvents.length > 0 ? (
@@ -199,7 +226,7 @@ export function ProfilePage() {
             <div className="list-section__header">
               <div>
                 <p className="eyebrow">Hosted</p>
-                <h2>{profile.displayName.split(' ')[0]}'s bubbles</h2>
+                <h2>{profile.displayName.split(' ')[0]}'s sessions</h2>
               </div>
             </div>
             <div className="event-list">
@@ -215,7 +242,7 @@ export function ProfilePage() {
             <div className="list-section__header">
               <div>
                 <p className="eyebrow">Joined</p>
-                <h2>Upcoming plans</h2>
+                <h2>Upcoming sessions</h2>
               </div>
             </div>
             <div className="event-list">
@@ -233,20 +260,21 @@ export function ProfilePage() {
           onClose={() => setDeleteOpen(false)}
           footer={
             <>
-              <button
+              <Button
+                variant="outline"
                 className="secondary-button"
                 type="button"
                 onClick={() => setDeleteOpen(false)}
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 className="primary-button primary-button--compact"
                 type="button"
                 onClick={handleDelete}
               >
                 Delete
-              </button>
+              </Button>
             </>
           }
         >
@@ -262,41 +290,41 @@ export function ProfilePage() {
           onClose={() => setReportTarget(null)}
           footer={
             <>
-              <button
+              <Button
+                variant="outline"
                 className="secondary-button"
                 type="button"
                 onClick={() => setReportTarget(null)}
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 className="primary-button primary-button--compact"
                 type="button"
                 onClick={handleReport}
               >
                 Submit report
-              </button>
+              </Button>
             </>
           }
         >
           <label className="field">
             <span className="field__label">Reason</span>
-            <select
-              className="select-field"
+            <NativeSelect
               value={reportReason}
               onChange={(event) => setReportReason(event.target.value)}
             >
               {REPORT_REASONS.map((reason) => (
-                <option key={reason} value={reason}>
+                <NativeSelectOption key={reason} value={reason}>
                   {reason}
-                </option>
+                </NativeSelectOption>
               ))}
-            </select>
+            </NativeSelect>
           </label>
           <label className="field">
             <span className="field__label">Notes</span>
-            <textarea
-              className="text-field text-field--textarea"
+            <Textarea
+              className="text-field--textarea"
               rows={4}
               value={reportNotes}
               onChange={(event) => setReportNotes(event.target.value)}
@@ -349,11 +377,10 @@ function OwnProfileEditor({
 
   return (
     <form className="stack" onSubmit={handleSave}>
-      <section className="glass-card form-card">
+      <Card className="form-card">
         <label className="field">
           <span className="field__label">Display name</span>
-          <input
-            className="text-field"
+          <Input
             type="text"
             value={displayName}
             onChange={(event) => setDisplayName(event.target.value)}
@@ -361,8 +388,8 @@ function OwnProfileEditor({
         </label>
         <label className="field">
           <span className="field__label">Bio</span>
-          <textarea
-            className="text-field text-field--textarea"
+          <Textarea
+            className="text-field--textarea"
             rows={4}
             value={bio}
             onChange={(event) => setBio(event.target.value)}
@@ -370,12 +397,11 @@ function OwnProfileEditor({
         </label>
         <label className="field">
           <span className="field__label">Languages</span>
-          <input
-            className="text-field"
+          <Input
             type="text"
             value={languages}
             onChange={(event) => setLanguages(event.target.value)}
-            placeholder="Romanian, English"
+            placeholder="English, Dutch"
           />
         </label>
         <div className="field">
@@ -385,14 +411,16 @@ function OwnProfileEditor({
           </div>
           <div className="chip-grid">
             {INTEREST_OPTIONS.map((interest) => (
-              <button
+              <Button
                 key={interest}
-                className={`pill-button${interests.includes(interest) ? ' is-active' : ''}`}
                 type="button"
+                variant={interests.includes(interest) ? 'default' : 'outline'}
+                size="sm"
+                className="pill-button"
                 onClick={() => toggleInterest(interest)}
               >
                 {interest}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -401,18 +429,16 @@ function OwnProfileEditor({
             <span className="field__label">Nearby discovery</span>
             <p className="field__hint">Open-map visibility is opt-in on the profile.</p>
           </div>
-          <input
-            type="checkbox"
+          <Switch
             checked={nearbyDiscoveryEnabled}
-            onChange={(event) => setNearbyDiscoveryEnabled(event.target.checked)}
+            onCheckedChange={setNearbyDiscoveryEnabled}
           />
-          <span className="switch-card__toggle" aria-hidden="true" />
         </label>
         {savedMessage ? <p className="helper-copy helper-copy--success">{savedMessage}</p> : null}
-        <button className="primary-button" type="submit">
+        <Button className="primary-button" type="submit">
           Save profile
-        </button>
-      </section>
+        </Button>
+      </Card>
     </form>
   );
 }

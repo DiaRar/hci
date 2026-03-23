@@ -2,6 +2,17 @@ import { MapPinned, Rocket, ShieldCheck } from 'lucide-react';
 import { useState, type Dispatch, type FormEvent, type SetStateAction } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import {
+  NativeSelect,
+  NativeSelectOption,
+} from '@/components/ui/native-select';
+import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
+
 import { AppFrame, PageHeader } from '../components/AppFrame';
 import { EventMap } from '../components/EventMap';
 import {
@@ -17,7 +28,7 @@ import type { CategoryId, EventLocation, SkillLevel } from '../types';
 export function CreatePage() {
   const navigate = useNavigate();
   const { createEvent, events, userLocation } = useBubbleStore();
-  const [category, setCategory] = useState<CategoryId>('coffee');
+  const [category, setCategory] = useState<CategoryId>('tennis');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [startTime, setStartTime] = useState(toLocalDateTimeInputValue());
@@ -26,7 +37,7 @@ export function CreatePage() {
   const [skillLevel, setSkillLevel] = useState<SkillLevel>('open');
   const [womenOnly, setWomenOnly] = useState(false);
   const [requiredEquipment, setRequiredEquipment] = useState<string[]>([]);
-  const [extraFacilities, setExtraFacilities] = useState<string[]>(['Wi-Fi']);
+  const [extraFacilities, setExtraFacilities] = useState<string[]>(['Lockers']);
   const [location, setLocation] = useState<EventLocation>({
     label: userLocation.label,
     lat: userLocation.lat,
@@ -68,7 +79,7 @@ export function CreatePage() {
     });
 
     if (!eventId) {
-      setErrorMessage('You need an active session before launching a bubble.');
+      setErrorMessage('You need an active profile before creating a session.');
       return;
     }
 
@@ -79,54 +90,54 @@ export function CreatePage() {
     <AppFrame>
       <main className="screen">
         <PageHeader
-          title="Create bubble"
-          subtitle="Every must-have field is visible up front so a new user can publish fast."
+          title="Create session"
+          subtitle="Sport, skill level, timing, and location stay visible up front so players can commit quickly."
           backTo="/discover"
         />
 
-        <section className="glass-card create-intro">
+        <Card className="create-intro">
           <div>
             <p className="eyebrow">Checklist</p>
-            <h2>Pin it, title it, launch it.</h2>
+            <h2>Pick the sport, pin the court, launch it.</h2>
             <p>
-              Category, title, description, start time, and location are required.
-              Price, duration, equipment, and facilities make the event easier to trust.
+              Sport, title, description, start time, and location are required.
+              Price, duration, equipment, and facilities help players decide faster.
             </p>
           </div>
-          <div className="soft-badge">
+          <Badge variant="outline" className="soft-badge">
             <ShieldCheck size={12} />
             Text, map, and attendee transparency only
-          </div>
-        </section>
+          </Badge>
+        </Card>
 
         <form className="stack" onSubmit={handleSubmit}>
-          <section className="glass-card">
+          <Card>
             <div className="section-title">
               <Rocket size={16} />
-              <span>Choose a vibe</span>
+              <span>Choose a sport</span>
             </div>
             <div className="chip-grid chip-grid--categories">
               {Object.entries(CATEGORY_META).map(([id, meta]) => (
-                <button
+                <Button
                   key={id}
-                  className={`category-chip${category === id ? ' is-active' : ''}`}
                   type="button"
+                  variant={category === id ? 'secondary' : 'outline'}
+                  className="category-chip"
                   onClick={() => setCategory(id as CategoryId)}
                 >
                   <span className="category-chip__emoji">{meta.emoji}</span>
                   <span>{meta.label}</span>
-                </button>
+                </Button>
               ))}
             </div>
-          </section>
+          </Card>
 
-          <section className="glass-card form-card">
+          <Card className="form-card">
             <label className="field">
               <span className="field__label">Title</span>
-              <input
-                className="text-field"
+              <Input
                 type="text"
-                placeholder="e.g. Sunday coffee sprint"
+                placeholder="e.g. Thursday evening padel doubles"
                 value={title}
                 onChange={(event) => setTitle(event.target.value)}
                 required
@@ -135,10 +146,10 @@ export function CreatePage() {
 
             <label className="field">
               <span className="field__label">Details</span>
-              <textarea
-                className="text-field text-field--textarea"
+              <Textarea
+                className="text-field--textarea"
                 rows={4}
-                placeholder="What is the plan, what should people bring, and what makes the event feel safe?"
+                placeholder="What is the format, who is it for, what should players bring, and anything important before arrival?"
                 value={description}
                 onChange={(event) => setDescription(event.target.value)}
                 required
@@ -148,8 +159,7 @@ export function CreatePage() {
             <div className="form-grid">
               <label className="field">
                 <span className="field__label">Start time</span>
-                <input
-                  className="text-field"
+                <Input
                   type="datetime-local"
                   value={startTime}
                   onChange={(event) => setStartTime(event.target.value)}
@@ -159,8 +169,7 @@ export function CreatePage() {
 
               <label className="field">
                 <span className="field__label">Duration (minutes)</span>
-                <input
-                  className="text-field"
+                <Input
                   type="number"
                   min="30"
                   step="15"
@@ -173,8 +182,7 @@ export function CreatePage() {
             <div className="form-grid">
               <label className="field">
                 <span className="field__label">Price</span>
-                <input
-                  className="text-field"
+                <Input
                   type="number"
                   min="0"
                   step="5"
@@ -185,47 +193,43 @@ export function CreatePage() {
 
               <label className="field">
                 <span className="field__label">Skill level</span>
-                <select
-                  className="select-field"
+                <NativeSelect
                   value={skillLevel}
                   onChange={(event) => setSkillLevel(event.target.value as SkillLevel)}
                 >
                   {SKILL_LEVELS.map((level) => (
-                    <option key={level.value} value={level.value}>
+                    <NativeSelectOption key={level.value} value={level.value}>
                       {level.label}
-                    </option>
+                    </NativeSelectOption>
                   ))}
-                </select>
+                </NativeSelect>
               </label>
             </div>
 
             <label className="switch-card">
               <div>
-                <span className="field__label">Women-only bubble</span>
+                <span className="field__label">Women-only session</span>
                 <p className="field__hint">
-                  Inclusive filters were requested in the focus group and stay explicit on the event card.
+                  Keep eligibility explicit on the session card so players can self-select confidently.
                 </p>
               </div>
-              <input
-                type="checkbox"
+              <Switch
                 checked={womenOnly}
-                onChange={(event) => setWomenOnly(event.target.checked)}
+                onCheckedChange={setWomenOnly}
               />
-              <span className="switch-card__toggle" aria-hidden="true" />
             </label>
-          </section>
+          </Card>
 
-          <section className="glass-card">
+          <Card>
             <div className="section-title">
               <MapPinned size={16} />
               <span>Set the location</span>
             </div>
             <label className="field">
               <span className="field__label">Location label</span>
-              <input
-                className="text-field"
+              <Input
                 type="text"
-                placeholder="e.g. Piata Romana fountain"
+                placeholder="e.g. X TU Delft Outdoor Courts"
                 value={location.label}
                 onChange={(event) =>
                   setLocation((current) => ({
@@ -237,7 +241,7 @@ export function CreatePage() {
               />
             </label>
             <p className="helper-copy">
-              Tap anywhere on the map to place the event pin. No pre-existing venues or sponsored spots are injected.
+              Tap anywhere on the map to place the session pin. No pre-filled sponsored courts or clubs are injected.
             </p>
             <EventMap
               compact
@@ -246,24 +250,26 @@ export function CreatePage() {
               pickerLocation={location}
               onPickLocation={setLocation}
             />
-          </section>
+          </Card>
 
-          <section className="glass-card">
+          <Card>
             <div className="field">
               <div className="field__label-row">
                 <span className="field__label">Required equipment</span>
-                <span className="field__hint">Focus-group addition</span>
+                <span className="field__hint">Shows what players need before they leave</span>
               </div>
               <div className="chip-grid">
                 {EQUIPMENT_OPTIONS.map((item) => (
-                  <button
+                  <Button
                     key={item}
-                    className={`pill-button${requiredEquipment.includes(item) ? ' is-active' : ''}`}
                     type="button"
+                    variant={requiredEquipment.includes(item) ? 'default' : 'outline'}
+                    size="sm"
+                    className="pill-button"
                     onClick={() => toggleListValue(item, setRequiredEquipment)}
                   >
                     {item}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>
@@ -271,29 +277,31 @@ export function CreatePage() {
             <div className="field">
               <div className="field__label-row">
                 <span className="field__label">Extra facilities</span>
-                <span className="field__hint">Another focus-group addition</span>
+                <span className="field__hint">Shows what the venue already provides</span>
               </div>
               <div className="chip-grid">
                 {FACILITY_OPTIONS.map((item) => (
-                  <button
+                  <Button
                     key={item}
-                    className={`pill-button${extraFacilities.includes(item) ? ' is-active' : ''}`}
                     type="button"
+                    variant={extraFacilities.includes(item) ? 'default' : 'outline'}
+                    size="sm"
+                    className="pill-button"
                     onClick={() => toggleListValue(item, setExtraFacilities)}
                   >
                     {item}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>
-          </section>
+          </Card>
 
           {errorMessage ? <p className="form-error">{errorMessage}</p> : null}
 
-          <button className="primary-button" type="submit">
-            Launch bubble
+          <Button className="primary-button" type="submit">
+            Launch session
             <Rocket size={16} />
-          </button>
+          </Button>
         </form>
       </main>
     </AppFrame>

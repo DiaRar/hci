@@ -1,12 +1,12 @@
 import type { LucideIcon } from 'lucide-react';
 import {
-  BookOpen,
-  BriefcaseBusiness,
-  Coffee,
+  CircleDotDashed,
+  Dumbbell,
   Footprints,
+  Goal,
   Sparkles,
   Trophy,
-  UtensilsCrossed,
+  Volleyball,
 } from 'lucide-react';
 
 import type { AttendanceStatus, CategoryId, CostFilter, SkillLevel } from '../types';
@@ -21,53 +21,53 @@ type CategoryMeta = {
 };
 
 export const CATEGORY_META: Record<CategoryId, CategoryMeta> = {
-  coffee: {
-    label: 'Coffee',
-    emoji: '☕',
-    accent: '#8d5f48',
-    glow: 'rgba(177, 119, 86, 0.26)',
-    icon: Coffee,
-    pinClassName: 'pin-coffee',
-  },
-  cowork: {
-    label: 'Cowork',
-    emoji: '💻',
-    accent: '#efab47',
-    glow: 'rgba(239, 171, 71, 0.28)',
-    icon: BriefcaseBusiness,
-    pinClassName: 'pin-cowork',
-  },
-  study: {
-    label: 'Study',
-    emoji: '📚',
-    accent: '#4eb5a6',
-    glow: 'rgba(78, 181, 166, 0.28)',
-    icon: BookOpen,
-    pinClassName: 'pin-study',
-  },
-  sports: {
-    label: 'Sports',
+  tennis: {
+    label: 'Tennis',
     emoji: '🎾',
-    accent: '#b4d63d',
-    glow: 'rgba(180, 214, 61, 0.3)',
+    accent: '#7a9f2f',
+    glow: 'rgba(122, 159, 47, 0.28)',
     icon: Trophy,
-    pinClassName: 'pin-sports',
+    pinClassName: 'pin-tennis',
   },
-  walk: {
-    label: 'Walk',
-    emoji: '🚶',
-    accent: '#5c9ded',
-    glow: 'rgba(92, 157, 237, 0.28)',
+  padel: {
+    label: 'Padel',
+    emoji: '🏓',
+    accent: '#0f8d84',
+    glow: 'rgba(15, 141, 132, 0.28)',
+    icon: CircleDotDashed,
+    pinClassName: 'pin-padel',
+  },
+  football: {
+    label: 'Football',
+    emoji: '⚽',
+    accent: '#e2a33f',
+    glow: 'rgba(226, 163, 63, 0.28)',
+    icon: Goal,
+    pinClassName: 'pin-football',
+  },
+  basketball: {
+    label: 'Basketball',
+    emoji: '🏀',
+    accent: '#e56d3a',
+    glow: 'rgba(229, 109, 58, 0.28)',
+    icon: Volleyball,
+    pinClassName: 'pin-basketball',
+  },
+  running: {
+    label: 'Running',
+    emoji: '🏃',
+    accent: '#5f7cff',
+    glow: 'rgba(95, 124, 255, 0.28)',
     icon: Footprints,
-    pinClassName: 'pin-walk',
+    pinClassName: 'pin-running',
   },
-  food: {
-    label: 'Food',
-    emoji: '🍜',
-    accent: '#ff8b6d',
-    glow: 'rgba(255, 139, 109, 0.3)',
-    icon: UtensilsCrossed,
-    pinClassName: 'pin-food',
+  training: {
+    label: 'Training',
+    emoji: '🏋️',
+    accent: '#3f5567',
+    glow: 'rgba(63, 85, 103, 0.24)',
+    icon: Dumbbell,
+    pinClassName: 'pin-training',
   },
 };
 
@@ -87,41 +87,42 @@ export const SKILL_LEVELS: Array<{ value: SkillLevel; label: string }> = [
 export const COST_FILTERS: Array<{ value: CostFilter; label: string }> = [
   { value: 'all', label: 'Any cost' },
   { value: 'free', label: 'Free' },
-  { value: 'budget', label: '< 50 lei' },
-  { value: 'premium', label: '50+ lei' },
+  { value: 'budget', label: 'Under €15' },
+  { value: 'premium', label: '€15+' },
 ];
 
 export const INTEREST_OPTIONS = [
-  'Coffee',
-  'Cowork',
   'Tennis',
+  'Padel',
+  'Football',
+  'Basketball',
+  'Running',
+  'Training',
+  'Cycling',
+  'Volleyball',
+  'Badminton',
   'Gym',
-  'Study',
-  'Walks',
-  'Food',
-  'Movies',
-  'Tech',
-  'Art',
-  'Music',
-  'Run club',
+  'Mobility',
+  'Recovery',
 ];
 
 export const EQUIPMENT_OPTIONS = [
-  'Laptop',
-  'Notebook',
   'Tennis racket',
+  'Padel racket',
+  'Football boots',
+  'Basketball shoes',
+  'Running shoes',
   'Water bottle',
-  'Yoga mat',
-  'Headphones',
+  'Resistance band',
 ];
 
 export const FACILITY_OPTIONS = [
-  'Coffee on site',
   'Lockers',
   'Showers',
-  'Parking',
-  'Wi-Fi',
-  'Snacks',
+  'Indoor courts',
+  'Outdoor courts',
+  'Equipment rental',
+  'Water fountain',
 ];
 
 export const REPORT_REASONS = [
@@ -133,9 +134,9 @@ export const REPORT_REASONS = [
 ];
 
 export const HERO_TAGLINES = [
-  'Find a plan near you in under a minute.',
-  'Join real people, not endless group chats.',
-  'Discover nearby vibes with clear context.',
+  'Find a game around campus in under a minute.',
+  'Join real players, not another dead team chat.',
+  'See the sport, the pin, and the turnout before you go.',
 ];
 
 export const COMMUNITY_NOTES = [
@@ -146,9 +147,10 @@ export const COMMUNITY_NOTES = [
 
 export const HIGHLIGHT_BADGES = [
   'Open map mode',
+  'Live player count',
   'Text chat only',
   'Mock encrypted badge',
-  'No sponsored venues',
+  'No sponsored clubs',
 ];
 
 export const SparklesIcon = Sparkles;

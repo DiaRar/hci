@@ -1,10 +1,10 @@
 export type CategoryId =
-  | 'coffee'
-  | 'cowork'
-  | 'study'
-  | 'sports'
-  | 'walk'
-  | 'food';
+  | 'tennis'
+  | 'padel'
+  | 'football'
+  | 'basketball'
+  | 'running'
+  | 'training';
 
 export type SkillLevel = 'open' | 'beginner' | 'intermediate' | 'advanced';
 

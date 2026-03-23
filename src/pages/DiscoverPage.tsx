@@ -22,6 +22,14 @@ import {
   formatDistanceKm,
 } from '../lib/format';
 import { useBubbleStore } from '../store/BubbleStore';
+import { Badge } from '@/components/ui/badge';
+import { Button, buttonVariants } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import {
+  NativeSelect,
+  NativeSelectOption,
+} from '@/components/ui/native-select';
+import { cn } from '@/lib/utils';
 
 const initialFilters: DiscoverFilters = {
   category: 'all',
@@ -52,9 +60,9 @@ export function DiscoverPage() {
         return event.price === 0;
       }
       if (filters.cost === 'budget') {
-        return event.price > 0 && event.price < 50;
+        return event.price > 0 && event.price < 15;
       }
-      return event.price >= 50;
+      return event.price >= 15;
     })
     .filter((event) =>
       filters.skill === 'all' ? true : event.skillLevel === filters.skill,
@@ -81,7 +89,7 @@ export function DiscoverPage() {
   const selectedEvent =
     filteredEvents.find((event) => event.id === effectiveSelectedEventId) ?? null;
   const filterSummary =
-    filters.category === 'all' ? 'All vibes' : CATEGORY_META[filters.category].label;
+    filters.category === 'all' ? 'All sports' : CATEGORY_META[filters.category].label;
 
   const clearFilters = () => {
     setFilters(initialFilters);
@@ -102,7 +110,14 @@ export function DiscoverPage() {
           <div className="discover-overlay discover-overlay--top">
             <div className="discover-toolbar">
               {currentUser ? (
-                <Link className="discover-toolbar__icon" to="/profile/me" aria-label="Open profile">
+                <Link
+                  className={cn(
+                    buttonVariants({ variant: 'outline', size: 'icon' }),
+                    'discover-toolbar__icon',
+                  )}
+                  to="/profile/me"
+                  aria-label="Open profile"
+                >
                   <Avatar user={currentUser} size="md" />
                 </Link>
               ) : (
@@ -111,56 +126,67 @@ export function DiscoverPage() {
 
               <div className="discover-brand-pill">Bubbleverse</div>
 
-              <button
+              <Button
+                variant="outline"
+                size="icon"
                 className="discover-toolbar__icon"
                 type="button"
                 onClick={signOut}
                 aria-label="Sign out"
               >
                 <LogOut size={18} />
-              </button>
+              </Button>
             </div>
 
             <div className="discover-filter-stack">
-              <button
-                className={`discover-filter-chip${filtersOpen ? ' is-open' : ''}`}
+              <Button
+                variant={filtersOpen ? 'secondary' : 'outline'}
+                className="discover-filter-chip"
                 type="button"
                 onClick={() => setFiltersOpen((current) => !current)}
               >
                 <SlidersHorizontal size={15} />
                 <span>{filterSummary}</span>
                 <span className="discover-filter-chip__count">{filteredEvents.length}</span>
-              </button>
+              </Button>
 
               {filtersOpen ? (
-                <section className="discover-filter-popover glass-card">
+                <Card className="discover-filter-popover">
                   <div className="discover-filter-popover__header">
                     <div>
                       <p className="eyebrow">Filters</p>
-                      <h2>Keep discovery compact.</h2>
+                      <h2>Tune the session feed.</h2>
                     </div>
-                    <button className="text-button" type="button" onClick={clearFilters}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-button"
+                      type="button"
+                      onClick={clearFilters}
+                    >
                       Reset
-                    </button>
+                    </Button>
                   </div>
 
                   <div className="discover-filter-pills">
-                    <button
-                      className={`pill-button${filters.category === 'all' ? ' is-active' : ''}`}
+                    <Button
+                      variant={filters.category === 'all' ? 'default' : 'outline'}
+                      size="sm"
+                      className="pill-button"
                       type="button"
                       onClick={() =>
                         setFilters((current) => ({ ...current, category: 'all' }))
                       }
                     >
                       All
-                    </button>
+                    </Button>
                     {Object.entries(CATEGORY_META).map(([id, meta]) => (
-                      <button
+                      <Button
                         key={id}
-                        className={`pill-button${
-                          filters.category === id ? ' is-active' : ''
-                        }`}
                         type="button"
+                        variant={filters.category === id ? 'default' : 'outline'}
+                        size="sm"
+                        className="pill-button"
                         onClick={() =>
                           setFilters((current) => ({
                             ...current,
@@ -170,15 +196,15 @@ export function DiscoverPage() {
                       >
                         <span>{meta.emoji}</span>
                         {meta.label}
-                      </button>
+                      </Button>
                     ))}
                   </div>
 
                   <div className="discover-filter-grid">
                     <label className="field field--compact">
                       <span className="field__label">Cost</span>
-                      <select
-                        className="select-field"
+                      <NativeSelect
+                        className="w-full"
                         value={filters.cost}
                         onChange={(event) =>
                           setFilters((current) => ({
@@ -187,17 +213,17 @@ export function DiscoverPage() {
                           }))
                         }
                       >
-                        <option value="all">Any</option>
-                        <option value="free">Free</option>
-                        <option value="budget">Budget</option>
-                        <option value="premium">Premium</option>
-                      </select>
+                        <NativeSelectOption value="all">Any</NativeSelectOption>
+                        <NativeSelectOption value="free">Free</NativeSelectOption>
+                        <NativeSelectOption value="budget">Budget</NativeSelectOption>
+                        <NativeSelectOption value="premium">Premium</NativeSelectOption>
+                      </NativeSelect>
                     </label>
 
                     <label className="field field--compact">
                       <span className="field__label">Skill</span>
-                      <select
-                        className="select-field"
+                      <NativeSelect
+                        className="w-full"
                         value={filters.skill}
                         onChange={(event) =>
                           setFilters((current) => ({
@@ -206,18 +232,20 @@ export function DiscoverPage() {
                           }))
                         }
                       >
-                        <option value="all">All</option>
-                        <option value="open">Open</option>
-                        <option value="beginner">Beginner</option>
-                        <option value="intermediate">Intermediate</option>
-                        <option value="advanced">Advanced</option>
-                      </select>
+                        <NativeSelectOption value="all">All</NativeSelectOption>
+                        <NativeSelectOption value="open">Open</NativeSelectOption>
+                        <NativeSelectOption value="beginner">Beginner</NativeSelectOption>
+                        <NativeSelectOption value="intermediate">Intermediate</NativeSelectOption>
+                        <NativeSelectOption value="advanced">Advanced</NativeSelectOption>
+                      </NativeSelect>
                     </label>
                   </div>
 
                   <div className="discover-filter-actions">
-                    <button
-                      className={`pill-button${filters.womenOnly ? ' is-active' : ''}`}
+                    <Button
+                      variant={filters.womenOnly ? 'default' : 'outline'}
+                      size="sm"
+                      className="pill-button"
                       type="button"
                       onClick={() =>
                         setFilters((current) => ({
@@ -227,10 +255,12 @@ export function DiscoverPage() {
                       }
                     >
                       Women-only
-                    </button>
+                    </Button>
 
-                    <button
-                      className={`pill-button${filters.sort === 'closest' ? ' is-active' : ''}`}
+                    <Button
+                      variant={filters.sort === 'closest' ? 'default' : 'outline'}
+                      size="sm"
+                      className="pill-button"
                       type="button"
                       onClick={() =>
                         setFilters((current) => ({
@@ -240,9 +270,9 @@ export function DiscoverPage() {
                       }
                     >
                       {filters.sort === 'closest' ? 'Closest first' : 'Soonest first'}
-                    </button>
+                    </Button>
                   </div>
-                </section>
+                </Card>
               ) : null}
             </div>
           </div>
@@ -251,7 +281,7 @@ export function DiscoverPage() {
             <div className="discover-overlay discover-overlay--bottom">
               <Link className="discover-event-preview" to={`/event/${selectedEvent.id}`}>
                 <div className="discover-event-preview__main">
-                  <span
+                  <Badge
                     className="category-token"
                     style={{
                       background: CATEGORY_META[selectedEvent.category].glow,
@@ -260,7 +290,7 @@ export function DiscoverPage() {
                   >
                     <span>{CATEGORY_META[selectedEvent.category].emoji}</span>
                     {CATEGORY_META[selectedEvent.category].label}
-                  </span>
+                  </Badge>
 
                   <div className="discover-event-preview__copy">
                     <h2>{selectedEvent.title}</h2>
@@ -290,31 +320,40 @@ export function DiscoverPage() {
             </div>
           ) : filteredEvents.length === 0 ? (
             <div className="discover-overlay discover-overlay--bottom">
-              <div className="discover-empty-card glass-card">
-                <h2>No bubbles match these filters.</h2>
-                <p>Reset the tooltip filters or create a new bubble from the map.</p>
-              </div>
+              <Card className="discover-empty-card">
+                <h2>No sessions match these filters.</h2>
+                <p>Reset the filters or launch a new session from the map.</p>
+              </Card>
             </div>
           ) : (
             <div className="discover-overlay discover-overlay--bottom">
               <div className="discover-hint-pill">
-                Tap a pin to preview the bubble.
+                Tap a pin to preview the session.
               </div>
             </div>
           )}
 
           <div className="discover-fab-stack">
-            <Link className="discover-fab discover-fab--primary" to="/create" aria-label="Create event">
+            <Link
+              className={cn(
+                buttonVariants({ size: 'icon-lg' }),
+                'discover-fab discover-fab--primary',
+              )}
+              to="/create"
+              aria-label="Create event"
+            >
               <Plus size={26} />
             </Link>
-            <button
+            <Button
+              variant="outline"
+              size="icon-lg"
               className="discover-fab discover-fab--secondary"
               type="button"
               onClick={() => setSelectedEventId(null)}
               aria-label="Center on your location"
             >
               <Crosshair size={20} />
-            </button>
+            </Button>
           </div>
         </section>
       </main>

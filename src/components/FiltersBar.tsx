@@ -1,5 +1,12 @@
 import { ArrowDownNarrowWide, ShieldCheck, SlidersHorizontal } from 'lucide-react';
 
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import {
+  NativeSelect,
+  NativeSelectOption,
+} from '@/components/ui/native-select';
+
 import { CATEGORY_META, COST_FILTERS, SKILL_LEVELS } from '../lib/constants';
 import type { CategoryId, CostFilter, SkillLevel, SortMode } from '../types';
 
@@ -25,79 +32,82 @@ export function FiltersBar({ filters, onChange }: FiltersBarProps) {
   };
 
   return (
-    <section className="filters-panel glass-card">
+    <section>
+      <Card className="filters-panel">
       <div className="filters-panel__row">
         <div className="section-title">
           <SlidersHorizontal size={16} />
-          <span>Find the right vibe</span>
+          <span>Find the right sport</span>
         </div>
-        <button
-          className={`pill-button pill-button--toggle${filters.womenOnly ? ' is-active' : ''}`}
-          type="button"
+        <Button
+          variant={filters.womenOnly ? 'default' : 'outline'}
+          size="sm"
+          className="pill-button pill-button--toggle"
           onClick={() => updateFilters({ womenOnly: !filters.womenOnly })}
         >
           <ShieldCheck size={14} />
           Women-only
-        </button>
+        </Button>
       </div>
 
       <div className="chip-grid chip-grid--categories">
-        <button
-          className={`category-chip${filters.category === 'all' ? ' is-active' : ''}`}
-          type="button"
+        <Button
+          variant={filters.category === 'all' ? 'secondary' : 'outline'}
+          className="category-chip"
           onClick={() => updateFilters({ category: 'all' })}
-        >
-          <span className="category-chip__emoji">✨</span>
-          <span>All vibes</span>
-        </button>
+          >
+            <span className="category-chip__emoji">🏅</span>
+            <span>All sports</span>
+          </Button>
         {Object.entries(CATEGORY_META).map(([id, meta]) => (
-          <button
+          <Button
             key={id}
-            className={`category-chip${filters.category === id ? ' is-active' : ''}`}
-            type="button"
+            variant={filters.category === id ? 'secondary' : 'outline'}
+            className="category-chip"
             onClick={() => updateFilters({ category: id as CategoryId })}
           >
             <span className="category-chip__emoji">{meta.emoji}</span>
             <span>{meta.label}</span>
-          </button>
+          </Button>
         ))}
       </div>
 
       <div className="filters-panel__row filters-panel__row--wrap">
         {COST_FILTERS.map((option) => (
-          <button
+          <Button
             key={option.value}
-            className={`pill-button${filters.cost === option.value ? ' is-active' : ''}`}
-            type="button"
+            variant={filters.cost === option.value ? 'default' : 'outline'}
+            size="sm"
+            className="pill-button"
             onClick={() => updateFilters({ cost: option.value })}
           >
             {option.label}
-          </button>
+          </Button>
         ))}
       </div>
 
       <div className="filters-panel__row filters-panel__row--wrap">
         <label className="field field--compact">
           <span className="field__label">Skill level</span>
-          <select
-            className="select-field"
+          <NativeSelect
             value={filters.skill}
             onChange={(event) =>
               updateFilters({ skill: event.target.value as DiscoverFilters['skill'] })
             }
           >
-            <option value="all">All levels</option>
+            <NativeSelectOption value="all">All levels</NativeSelectOption>
             {SKILL_LEVELS.map((level) => (
-              <option key={level.value} value={level.value}>
+              <NativeSelectOption key={level.value} value={level.value}>
                 {level.label}
-              </option>
+              </NativeSelectOption>
             ))}
-          </select>
+          </NativeSelect>
         </label>
 
-        <button
-          className={`pill-button pill-button--toggle${filters.sort === 'closest' ? ' is-active' : ''}`}
-          type="button"
+        <Button
+          variant={filters.sort === 'closest' ? 'default' : 'outline'}
+          size="sm"
+          className="pill-button pill-button--toggle"
           onClick={() =>
             updateFilters({
               sort: filters.sort === 'closest' ? 'soonest' : 'closest',
@@ -106,8 +116,9 @@ export function FiltersBar({ filters, onChange }: FiltersBarProps) {
         >
           <ArrowDownNarrowWide size={14} />
           {filters.sort === 'closest' ? 'Closest first' : 'Soonest first'}
-        </button>
+        </Button>
       </div>
+      </Card>
     </section>
   );
 }

@@ -1,6 +1,8 @@
 import { Compass, Plus, UserRound } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
+import { cn } from '@/lib/utils';
+
 const navigation = [
   { to: '/discover', label: 'Discover', icon: Compass },
   { to: '/create', label: 'Create', icon: Plus },
@@ -16,7 +18,9 @@ export function BottomNav() {
           <NavLink
             key={item.to}
             to={item.to}
-            className={({ isActive }) => `bottom-nav__link${isActive ? ' is-active' : ''}`}
+            className={({ isActive }) =>
+              cn('bottom-nav__link', isActive && 'is-active')
+            }
           >
             <Icon size={18} />
             <span>{item.label}</span>

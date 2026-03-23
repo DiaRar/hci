@@ -1,5 +1,13 @@
-import { X } from 'lucide-react';
 import type { PropsWithChildren, ReactNode } from 'react';
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 type ModalProps = PropsWithChildren<{
   open: boolean;
@@ -10,26 +18,23 @@ type ModalProps = PropsWithChildren<{
 }>;
 
 export function Modal({ open, title, description, footer, children, onClose }: ModalProps) {
-  if (!open) {
-    return null;
-  }
-
   return (
-    <div className="modal-backdrop" role="presentation">
-      <div className="modal-card" role="dialog" aria-modal="true" aria-label={title}>
-        <div className="modal-card__header">
+    <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
+      <DialogContent className="modal-card">
+        <DialogHeader className="modal-card__header">
           <div>
             <p className="eyebrow">Safety & trust</p>
-            <h2>{title}</h2>
-            {description ? <p className="modal-card__description">{description}</p> : null}
+            <DialogTitle>{title}</DialogTitle>
+            {description ? (
+              <DialogDescription className="modal-card__description">
+                {description}
+              </DialogDescription>
+            ) : null}
           </div>
-          <button className="icon-button icon-button--ghost" type="button" onClick={onClose}>
-            <X size={18} />
-          </button>
-        </div>
+        </DialogHeader>
         <div className="modal-card__content">{children}</div>
-        {footer ? <div className="modal-card__footer">{footer}</div> : null}
-      </div>
-    </div>
+        {footer ? <DialogFooter className="modal-card__footer">{footer}</DialogFooter> : null}
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -2,6 +2,17 @@ import { Flag, Lock, SendHorizontal } from 'lucide-react';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
+import { Badge } from '@/components/ui/badge';
+import { Button, buttonVariants } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import {
+  NativeSelect,
+  NativeSelectOption,
+} from '@/components/ui/native-select';
+import { Textarea } from '@/components/ui/textarea';
+import { cn } from '@/lib/utils';
+
 import { AppFrame, PageHeader } from '../components/AppFrame';
 import { Avatar } from '../components/Avatar';
 import { Modal } from '../components/Modal';
@@ -34,14 +45,17 @@ export function ChatPage() {
         <main className="screen">
           <PageHeader
             title="Chat unavailable"
-            subtitle="The event behind this chat no longer exists."
+            subtitle="The session behind this chat no longer exists."
             backTo="/discover"
           />
-          <div className="glass-card empty-state">
-            <Link className="primary-button primary-button--compact" to="/discover">
+          <Card className="empty-state">
+            <Link
+              className={cn(buttonVariants({ size: 'sm' }), 'primary-button')}
+              to="/discover"
+            >
               Back to discover
             </Link>
-          </div>
+          </Card>
         </main>
       </AppFrame>
     );
@@ -72,19 +86,19 @@ export function ChatPage() {
     <AppFrame>
       <main className="screen screen--chat">
         <PageHeader
-          title="Event chat"
-          subtitle="Text-only messaging with demo moderation markers."
+          title="Session chat"
+          subtitle="Text-only team chat with demo moderation markers."
           backTo={`/event/${event.id}`}
           action={
-            <span className="soft-badge">
+            <Badge variant="outline" className="soft-badge">
               <Lock size={12} />
               Encrypted badge
-            </span>
+            </Badge>
           }
         />
 
         {!isAttending ? (
-          <section className="glass-card notice-card">
+          <Card className="notice-card">
             <div>
               <h2>Join first</h2>
               <p>
@@ -92,17 +106,17 @@ export function ChatPage() {
                 you send messages.
               </p>
             </div>
-            <button
+            <Button
               className="primary-button primary-button--compact"
               type="button"
               onClick={() => joinEvent(event.id)}
             >
-              Join event
-            </button>
-          </section>
+              Join session
+            </Button>
+          </Card>
         ) : null}
 
-        <section className="chat-stream glass-card">
+        <Card className="chat-stream">
           <div className="chat-stream__header">
             <div>
               <p className="eyebrow">{event.title}</p>
@@ -157,19 +171,21 @@ export function ChatPage() {
                       <p>{message.text}</p>
                       <div className="message-bubble__actions">
                         {message.demoModerationState === 'flagged' ? (
-                          <span className="soft-badge soft-badge--danger">
+                          <Badge variant="destructive" className="soft-badge soft-badge--danger">
                             Flagged by demo moderation
-                          </span>
+                          </Badge>
                         ) : null}
                         {!isOwnMessage ? (
-                          <button
+                          <Button
+                            variant="ghost"
+                            size="sm"
                             className="text-button"
                             type="button"
                             onClick={() => setReportingMessageId(message.id)}
                           >
                             <Flag size={12} />
                             Report
-                          </button>
+                          </Button>
                         ) : null}
                       </div>
                     </article>
@@ -185,19 +201,21 @@ export function ChatPage() {
             )}
             <div ref={scrollAnchor} />
           </div>
-        </section>
+        </Card>
 
-        <form className="composer glass-card" onSubmit={handleSubmit}>
-          <input
-            className="text-field composer__input"
-            type="text"
-            placeholder="Type a message..."
-            value={draft}
-            onChange={(event) => setDraft(event.target.value)}
-          />
-          <button className="primary-button composer__button" type="submit">
-            <SendHorizontal size={16} />
-          </button>
+        <form onSubmit={handleSubmit}>
+          <Card className="composer">
+            <Input
+              className="composer__input"
+              type="text"
+              placeholder="Type a message for the group..."
+              value={draft}
+              onChange={(event) => setDraft(event.target.value)}
+            />
+            <Button className="primary-button composer__button" type="submit">
+              <SendHorizontal size={16} />
+            </Button>
+          </Card>
         </form>
 
         <Modal
@@ -207,41 +225,41 @@ export function ChatPage() {
           onClose={() => setReportingMessageId(null)}
           footer={
             <>
-              <button
+              <Button
+                variant="outline"
                 className="secondary-button"
                 type="button"
                 onClick={() => setReportingMessageId(null)}
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 className="primary-button primary-button--compact"
                 type="button"
                 onClick={handleReport}
               >
                 Submit report
-              </button>
+              </Button>
             </>
           }
         >
           <label className="field">
             <span className="field__label">Reason</span>
-            <select
-              className="select-field"
+            <NativeSelect
               value={reportReason}
               onChange={(event) => setReportReason(event.target.value)}
             >
               {REPORT_REASONS.map((reason) => (
-                <option key={reason} value={reason}>
+                <NativeSelectOption key={reason} value={reason}>
                   {reason}
-                </option>
+                </NativeSelectOption>
               ))}
-            </select>
+            </NativeSelect>
           </label>
           <label className="field">
             <span className="field__label">Notes</span>
-            <textarea
-              className="text-field text-field--textarea"
+            <Textarea
+              className="text-field--textarea"
               rows={4}
               value={reportNotes}
               onChange={(event) => setReportNotes(event.target.value)}
