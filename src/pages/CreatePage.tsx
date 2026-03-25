@@ -45,6 +45,7 @@ export function CreatePage() {
   });
   const [errorMessage, setErrorMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showOptionalSettings, setShowOptionalSettings] = useState(false);
 
   const toggleListValue = (
     value: string,
@@ -61,24 +62,52 @@ export function CreatePage() {
     event.preventDefault();
     setErrorMessage('');
 
-    if (!title.trim() || !description.trim() || !startTime || !location.label.trim()) {
+    const normalizedTitle = title.trim();
+    const normalizedDescription = description.trim();
+    const normalizedLocationLabel = location.label.trim();
+    const parsedStartTime = new Date(startTime);
+
+    if (!normalizedTitle || !normalizedDescription || !startTime || !normalizedLocationLabel) {
       setErrorMessage('Title, description, start time, and location are required.');
+      return;
+    }
+
+    if (Number.isNaN(parsedStartTime.getTime())) {
+      setErrorMessage('Please provide a valid start time.');
+      return;
+    }
+
+    if (parsedStartTime.getTime() < Date.now()) {
+      setErrorMessage('Start time cannot be in the past.');
+      return;
+    }
+
+    if (!Number.isFinite(durationMinutes) || durationMinutes < 30) {
+      setErrorMessage('Duration must be at least 30 minutes.');
+      return;
+    }
+
+    if (!Number.isFinite(price) || price < 0) {
+      setErrorMessage('Price cannot be negative.');
       return;
     }
 
     setIsSubmitting(true);
     const eventId = createEvent({
-      title,
-      description,
+      title: normalizedTitle,
+      description: normalizedDescription,
       category,
-      startTime: new Date(startTime).toISOString(),
+      startTime: parsedStartTime.toISOString(),
       durationMinutes,
       price,
       skillLevel,
       womenOnly,
       requiredEquipment,
       extraFacilities,
-      location,
+      location: {
+        ...location,
+        label: normalizedLocationLabel,
+      },
     });
 
     if (!eventId) {
@@ -210,18 +239,31 @@ export function CreatePage() {
               </label>
             </div>
 
-            <label className="switch-card">
-              <div>
-                <span className="field__label">Women-only session</span>
-                <p className="field__hint">
-                  Keep eligibility explicit on the session card so players can self-select confidently.
-                </p>
-              </div>
-              <Switch
-                checked={womenOnly}
-                onCheckedChange={setWomenOnly}
-              />
-            </label>
+            <Button
+              variant="outline"
+              className="secondary-button"
+              type="button"
+              onClick={() => setShowOptionalSettings((current) => !current)}
+            >
+              {showOptionalSettings ? 'Hide optional settings' : 'Show optional settings'}
+            </Button>
+
+            {showOptionalSettings ? (
+              <>
+                <label className="switch-card">
+                  <div>
+                    <span className="field__label">Women-only session</span>
+                    <p className="field__hint">
+                      Keep eligibility explicit on the session card so players can self-select confidently.
+                    </p>
+                  </div>
+                  <Switch
+                    checked={womenOnly}
+                    onCheckedChange={setWomenOnly}
+                  />
+                </label>
+              </>
+            ) : null}
           </Card>
 
           <Card>
@@ -256,49 +298,51 @@ export function CreatePage() {
             />
           </Card>
 
-          <Card>
-            <div className="field">
-              <div className="field__label-row">
-                <span className="field__label">Required equipment</span>
-                <span className="field__hint">Shows what players need before they leave</span>
+          {showOptionalSettings ? (
+            <Card>
+              <div className="field">
+                <div className="field__label-row">
+                  <span className="field__label">Required equipment</span>
+                  <span className="field__hint">Shows what players need before they leave</span>
+                </div>
+                <div className="chip-grid">
+                  {EQUIPMENT_OPTIONS.map((item) => (
+                    <Button
+                      key={item}
+                      type="button"
+                      variant={requiredEquipment.includes(item) ? 'default' : 'outline'}
+                      size="sm"
+                      className="pill-button"
+                      onClick={() => toggleListValue(item, setRequiredEquipment)}
+                    >
+                      {item}
+                    </Button>
+                  ))}
+                </div>
               </div>
-              <div className="chip-grid">
-                {EQUIPMENT_OPTIONS.map((item) => (
-                  <Button
-                    key={item}
-                    type="button"
-                    variant={requiredEquipment.includes(item) ? 'default' : 'outline'}
-                    size="sm"
-                    className="pill-button"
-                    onClick={() => toggleListValue(item, setRequiredEquipment)}
-                  >
-                    {item}
-                  </Button>
-                ))}
-              </div>
-            </div>
 
-            <div className="field">
-              <div className="field__label-row">
-                <span className="field__label">Extra facilities</span>
-                <span className="field__hint">Shows what the venue already provides</span>
+              <div className="field">
+                <div className="field__label-row">
+                  <span className="field__label">Extra facilities</span>
+                  <span className="field__hint">Shows what the venue already provides</span>
+                </div>
+                <div className="chip-grid">
+                  {FACILITY_OPTIONS.map((item) => (
+                    <Button
+                      key={item}
+                      type="button"
+                      variant={extraFacilities.includes(item) ? 'default' : 'outline'}
+                      size="sm"
+                      className="pill-button"
+                      onClick={() => toggleListValue(item, setExtraFacilities)}
+                    >
+                      {item}
+                    </Button>
+                  ))}
+                </div>
               </div>
-              <div className="chip-grid">
-                {FACILITY_OPTIONS.map((item) => (
-                  <Button
-                    key={item}
-                    type="button"
-                    variant={extraFacilities.includes(item) ? 'default' : 'outline'}
-                    size="sm"
-                    className="pill-button"
-                    onClick={() => toggleListValue(item, setExtraFacilities)}
-                  >
-                    {item}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          </Card>
+            </Card>
+          ) : null}
 
           {errorMessage ? <p className="form-error">{errorMessage}</p> : null}
 

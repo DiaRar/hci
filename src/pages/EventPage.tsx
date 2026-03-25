@@ -260,6 +260,9 @@ export function EventPage() {
             <Lock size={16} />
             <span>Attendance & chat</span>
           </div>
+          <p className="helper-copy">
+            Pick a status to join. Chat opens in one tap.
+          </p>
           <div className="status-selector">
             {(Object.entries(ATTENDANCE_LABELS) as Array<[AttendanceStatus, string]>).map(
               ([status, label]) => (
@@ -290,16 +293,6 @@ export function EventPage() {
             <Button className="primary-button" type="button" onClick={handleChatEntry}>
               {isAttending ? 'Open chat' : 'Join session & chat'}
             </Button>
-            {!isAttending ? (
-              <Button
-                variant="outline"
-                className="secondary-button"
-                type="button"
-                onClick={() => joinEvent(event.id)}
-              >
-                Join without chat
-              </Button>
-            ) : null}
           </div>
         </Card>
 
