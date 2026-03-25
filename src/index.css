@@ -35,7 +35,9 @@
   --secondary: #e2f1ee;
   --secondary-foreground: #12504a;
   --muted: #eef2ef;
-  --muted-foreground: #68737c;
+  --muted-foreground: #60707d;
+  --primary-soft: rgba(228, 93, 56, 0.12);
+  --primary-soft-strong: rgba(228, 93, 56, 0.2);
   --accent: #ffe0b5;
   --accent-foreground: #8a4e1f;
   --destructive: #cb4b37;
@@ -1348,7 +1350,7 @@ p {
 }
 
 .bottom-nav__link.is-active {
-  background: rgba(228, 93, 56, 0.2);
+  background: var(--primary-soft-strong);
   color: var(--primary);
   border-top: 2px solid var(--primary);
   padding-top: 8px;
@@ -1900,13 +1902,6 @@ p {
   color: var(--muted-foreground);
 }
 
-.helper-copy,
-.field__hint,
-.event-card__headline p,
-.person-card span {
-  color: #60707d;
-}
-
 .event-card-link {
   display: block;
 }
@@ -1934,9 +1929,8 @@ p {
 
 .discover-filter-chip__count,
 .discover-event-preview__action,
-.event-card__count-badge,
-.bottom-nav__link.is-active {
-  background: rgba(228, 93, 56, 0.12);
+.event-card__count-badge {
+  background: var(--primary-soft);
   color: var(--primary);
 }
 
