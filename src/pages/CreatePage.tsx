@@ -44,6 +44,7 @@ export function CreatePage() {
     lng: userLocation.lng,
   });
   const [errorMessage, setErrorMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const toggleListValue = (
     value: string,
@@ -58,12 +59,14 @@ export function CreatePage() {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setErrorMessage('');
 
     if (!title.trim() || !description.trim() || !startTime || !location.label.trim()) {
       setErrorMessage('Title, description, start time, and location are required.');
       return;
     }
 
+    setIsSubmitting(true);
     const eventId = createEvent({
       title,
       description,
@@ -80,6 +83,7 @@ export function CreatePage() {
 
     if (!eventId) {
       setErrorMessage('You need an active profile before creating a session.');
+      setIsSubmitting(false);
       return;
     }
 
@@ -298,8 +302,8 @@ export function CreatePage() {
 
           {errorMessage ? <p className="form-error">{errorMessage}</p> : null}
 
-          <Button className="primary-button" type="submit">
-            Launch session
+          <Button className="primary-button" type="submit" disabled={isSubmitting}>
+            {isSubmitting ? 'Launching session…' : 'Launch session'}
             <Rocket size={16} />
           </Button>
         </form>

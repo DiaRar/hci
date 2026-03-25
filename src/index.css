@@ -360,7 +360,7 @@ p {
 .helper-copy {
   font-size: 0.88rem;
   line-height: 1.5;
-  color: var(--muted);
+  color: var(--muted-foreground);
 }
 
 .helper-copy--success {
@@ -531,7 +531,7 @@ p {
 .field__hint {
   font-size: 0.78rem;
   font-weight: 500;
-  color: var(--muted);
+  color: var(--muted-foreground);
 }
 
 .text-field,
@@ -829,7 +829,22 @@ p {
 .event-card__headline p {
   font-size: 0.9rem;
   line-height: 1.5;
-  color: var(--muted);
+  color: var(--muted-foreground);
+}
+
+.line-clamp-2,
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-2 {
+  -webkit-line-clamp: 2;
+}
+
+.line-clamp-3 {
+  -webkit-line-clamp: 3;
 }
 
 .event-card__emoji {
@@ -1220,7 +1235,7 @@ p {
 }
 
 .message-bubble {
-  max-width: 78%;
+  max-width: min(360px, 80%);
   padding: 12px 14px;
   border-radius: 20px;
   background: rgba(247, 245, 255, 0.92);
@@ -1333,8 +1348,10 @@ p {
 }
 
 .bottom-nav__link.is-active {
-  background: rgba(107, 92, 255, 0.12);
+  background: rgba(228, 93, 56, 0.2);
   color: var(--primary);
+  border-top: 2px solid var(--primary);
+  padding-top: 8px;
 }
 
 .modal-backdrop {
@@ -1384,8 +1401,8 @@ p {
 .discover-map-wrap {
   position: relative;
   flex: 1;
-  height: calc(100vh - 20px);
-  min-height: calc(100vh - 20px);
+  height: clamp(420px, calc(100vh - 20px), 1100px);
+  min-height: 420px;
   overflow: hidden;
   border-radius: 34px;
   background: #eef0f4;
@@ -1639,7 +1656,7 @@ p {
 }
 
 .discover-empty-card p {
-  color: var(--muted);
+  color: var(--muted-foreground);
   line-height: 1.5;
 }
 
@@ -1881,6 +1898,13 @@ p {
 .modal-card__description,
 .field__label-row .field__hint {
   color: var(--muted-foreground);
+}
+
+.helper-copy,
+.field__hint,
+.event-card__headline p,
+.person-card span {
+  color: #60707d;
 }
 
 .event-card-link {
