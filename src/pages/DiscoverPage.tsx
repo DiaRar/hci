@@ -141,7 +141,7 @@ export function DiscoverPage() {
             <div className="discover-filter-stack">
               <Button
                 variant={filtersOpen ? 'secondary' : 'outline'}
-                className="discover-filter-chip"
+                className={cn('discover-filter-chip', filtersOpen && 'is-open')}
                 type="button"
                 onClick={() => setFiltersOpen((current) => !current)}
               >
