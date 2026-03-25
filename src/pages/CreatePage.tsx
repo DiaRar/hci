@@ -25,6 +25,8 @@ import { toLocalDateTimeInputValue } from '../lib/format';
 import { useBubbleStore } from '../store/BubbleStore';
 import type { CategoryId, EventLocation, SkillLevel } from '../types';
 
+const MIN_START_LEAD_TIME_MS = 5 * 60 * 1000;
+
 export function CreatePage() {
   const navigate = useNavigate();
   const { createEvent, events, userLocation } = useBubbleStore();
@@ -77,12 +79,17 @@ export function CreatePage() {
       return;
     }
 
-    if (parsedStartTime.getTime() < Date.now()) {
-      setErrorMessage('Start time cannot be in the past.');
+    if (parsedStartTime.getTime() < Date.now() + MIN_START_LEAD_TIME_MS) {
+      setErrorMessage('Start time must be at least 5 minutes from now.');
       return;
     }
 
-    if (!Number.isFinite(durationMinutes) || durationMinutes < 30) {
+    if (!Number.isFinite(durationMinutes)) {
+      setErrorMessage('Duration must be a valid number.');
+      return;
+    }
+
+    if (durationMinutes < 30) {
       setErrorMessage('Duration must be at least 30 minutes.');
       return;
     }
