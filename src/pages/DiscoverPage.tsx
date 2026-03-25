@@ -23,7 +23,8 @@ import {
 } from '../lib/format';
 import { useBubbleStore } from '../store/BubbleStore';
 import { Badge } from '@/components/ui/badge';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button-variants';
+import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
   NativeSelect,
@@ -141,7 +142,7 @@ export function DiscoverPage() {
             <div className="discover-filter-stack">
               <Button
                 variant={filtersOpen ? 'secondary' : 'outline'}
-                className="discover-filter-chip"
+                className={cn('discover-filter-chip', filtersOpen && 'is-open')}
                 type="button"
                 onClick={() => setFiltersOpen((current) => !current)}
               >

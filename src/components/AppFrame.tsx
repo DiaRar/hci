@@ -2,7 +2,7 @@ import { ChevronLeft } from 'lucide-react';
 import type { PropsWithChildren, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 
-import { buttonVariants } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button-variants';
 import { cn } from '@/lib/utils';
 
 import { BottomNav } from './BottomNav';
