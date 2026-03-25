@@ -50,8 +50,8 @@ export function EventCard({ event, selected = false }: EventCardProps) {
             {category.emoji}
           </div>
           <div>
-            <h3>{event.title}</h3>
-            <p>{event.description}</p>
+            <h3 className="line-clamp-2">{event.title}</h3>
+            <p className="line-clamp-3">{event.description}</p>
           </div>
         </div>
 

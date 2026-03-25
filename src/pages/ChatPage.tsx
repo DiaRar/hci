@@ -196,7 +196,9 @@ export function ChatPage() {
             ) : (
               <div className="message-row message-row--system">
                 <div className="message-bubble message-bubble--muted">
-                  No messages yet. Say hi first.
+                  {isAttending
+                    ? 'No messages yet. Say hi first.'
+                    : 'No messages yet. Join the session to start chatting.'}
                 </div>
               </div>
             )}
