@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-04-05T16:30:25.161Z
-> Files: 86 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-04-05T16:31:46.188Z
+> Files: 87 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../../../Users/diarar/.claude/plans/
 
@@ -53,6 +53,7 @@
 - `tsconfig.app.json` (~229 tok)
 - `tsconfig.json` — TypeScript configuration (~61 tok)
 - `tsconfig.node.json` (~187 tok)
+- `vercel.json` (~28 tok)
 - `vite.config.ts` — Vite build configuration (~96 tok)
 
 ## .claude/

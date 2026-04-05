@@ -295,6 +295,7 @@
 | 18:48 | Upgraded Discover map interactions and selected-event tray fallback behavior | src/pages/DiscoverPage.tsx, src/components/EventMap.tsx, .wolf/buglog.json | success | ~2600 |
 | 18:55 | Changed Discover layering so bottom tray overlays fixed-position floating actions | src/pages/DiscoverPage.tsx, .wolf/buglog.json | success | ~1700 |
 | 19:01 | Fine-tuned Discover crosshair icon optical centering within floating action button | src/pages/DiscoverPage.tsx, .wolf/buglog.json | success | ~1200 |
+| 19:09 | Upgraded AuthPage structure and fixed demo profile row layout for production polish | src/pages/AuthPage.tsx, .wolf/buglog.json | success | ~2400 |
 | 17:42 | Created src/pages/DiscoverPage.tsx | — | ~4257 |
 | 17:43 | Session end: 15 writes across 8 files (EventPage.tsx, ProfilePage.tsx, FINAL.md, EventCard.tsx, package.json) | 3 reads | ~55634 tok |
 | 17:43 | Created ../../../Users/diarar/.cursor/projects/Volumes-T7-lonely-boy/assets/Screenshot_2026-04-05_at_17.42.56-21293489-cc79-42fb-b7be-967e5e31b1a8.png | — | ~0 |
@@ -346,3 +347,5 @@
 | 18:29 | Created ../../../Users/diarar/.cursor/projects/Volumes-T7-lonely-boy/assets/Screenshot_2026-04-05_at_18.29.38-d7ca0a42-b716-42a3-9ccb-829a5e57a621.png | — | ~0 |
 | 18:30 | Created src/pages/AuthPage.tsx | — | ~2078 |
 | 18:30 | Created src/pages/AuthPage.tsx | — | ~2091 |
+| 18:31 | Session end: 54 writes across 31 files (EventPage.tsx, ProfilePage.tsx, FINAL.md, EventCard.tsx, package.json) | 7 reads | ~138749 tok |
+| 18:31 | Created vercel.json | — | ~28 |

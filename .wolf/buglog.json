@@ -302,6 +302,27 @@
       ],
       "occurrences": 1,
       "last_seen": "2026-04-05T19:01:00.000Z"
+    },
+    {
+      "id": "bug-017",
+      "timestamp": "2026-04-05T19:09:00.000Z",
+      "error_message": "Auth page not production-ready; demo profile rows visually collapsed and hierarchy felt rough",
+      "file": "src/pages/AuthPage.tsx",
+      "root_cause": "Demo account buttons lacked a robust internal content layout wrapper and section structure lacked clear separation between quick entry and manual auth form.",
+      "fix": "Reworked auth card hierarchy, fixed demo profile row composition with explicit flex wrappers, improved spacing and text treatment, added section divider, and strengthened primary submit CTA styling.",
+      "tags": [
+        "ui",
+        "auth",
+        "forms",
+        "production-polish",
+        "button-layout"
+      ],
+      "related_bugs": [
+        "bug-008",
+        "bug-012"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-04-05T19:09:00.000Z"
     }
   ]
 }
