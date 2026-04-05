@@ -1,5 +1,5 @@
 import { ArrowRight, Compass, Shield, UserRound } from 'lucide-react';
-import { Button, Card, Input, Switch, Tag } from 'antd';
+import { Button, Card, Input, Switch, Tag, Typography } from 'antd';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -42,8 +42,8 @@ export function AuthPage() {
 
   return (
     <AppFrame>
-      <main className="flex-1 flex flex-col gap-4 p-5 pb-6">
-        <Card className="relative overflow-hidden p-5">
+      <main className="flex flex-1 flex-col gap-4 overflow-y-auto p-5 pb-6">
+        <Card className="relative overflow-hidden rounded-2xl" styles={{ body: { padding: 16 } }}>
           <div className="flex flex-wrap gap-[10px] mb-4">
             <Tag className="m-0 inline-flex items-center gap-2 rounded-full bg-accent-purple-light px-3.5 py-2.5 text-[0.86rem] font-bold text-primary">
               <Compass size={14} />
@@ -72,22 +72,23 @@ export function AuthPage() {
           </div>
         </Card>
 
-        <Card className="flex flex-col gap-4 p-4">
-          <div className="inline-flex items-center gap-2 text-[0.98rem] font-extrabold text-ink-strong dark:text-foreground">
+        <Card className="rounded-2xl" styles={{ body: { padding: 16 } }}>
+          <div className="mb-2 inline-flex items-center gap-2 text-[0.98rem] font-extrabold text-ink-strong dark:text-foreground">
             <UserRound size={16} />
             <span>Jump in fast</span>
           </div>
-          <p className="text-[0.88rem] leading-relaxed text-muted-foreground">
+          <p className="mb-4 text-[0.88rem] leading-relaxed text-muted-foreground">
             Use a demo profile or create one with a visible display name so people know who is joining the session.
           </p>
 
-          <div className="grid gap-[10px] my-4">
+          <div className="mb-5 grid gap-[10px]">
             {demoUsers.map((user) => (
               <Button
                 key={user.id}
                 data-testid={`btn-demo-user-${user.id}`}
                 type="default"
-                className="h-auto justify-start text-left"
+                htmlType="button"
+                className="!h-auto !w-full !justify-start !px-3 !py-2"
                 onClick={() =>
                   authenticate({
                     displayName: user.displayName,
@@ -96,18 +97,22 @@ export function AuthPage() {
                   })
                 }
               >
-                <Avatar user={user} />
-                <div className="flex flex-col gap-0.5">
-                  <strong className="text-ink-strong dark:text-foreground">{user.displayName}</strong>
-                  <span className="text-[0.84rem] text-muted-foreground">
-                    {user.interests.slice(0, 2).join(' · ')}
-                  </span>
+                <div className="flex w-full items-center gap-3 text-left">
+                  <Avatar user={user} />
+                  <div className="min-w-0 flex-1">
+                    <Typography.Text className="!block !truncate !font-semibold !text-ink-strong dark:!text-foreground">
+                      {user.displayName}
+                    </Typography.Text>
+                    <Typography.Text className="!text-[0.82rem] !text-muted-foreground">
+                      {user.interests.slice(0, 2).join(' · ')}
+                    </Typography.Text>
+                  </div>
                 </div>
               </Button>
             ))}
           </div>
 
-          <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+          <form className="flex flex-col gap-4 border-t border-[rgba(44,44,44,0.14)] pt-4" onSubmit={handleSubmit}>
             <label className="flex flex-col gap-2">
               <span className="text-sm font-bold text-ink-strong dark:text-foreground">Display name</span>
               <Input
@@ -122,7 +127,9 @@ export function AuthPage() {
             <div className="flex flex-col gap-2">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-sm font-bold text-ink-strong dark:text-foreground">Interests</span>
-                <span className="text-[0.78rem] font-medium text-muted-foreground">Optional, but it improves your session feed.</span>
+                <span className="text-[0.78rem] font-medium text-muted-foreground">
+                  Optional, but it improves your session feed.
+                </span>
               </div>
               <div className="flex flex-wrap gap-[10px]">
                 {INTEREST_OPTIONS.map((interest) => (
@@ -131,7 +138,7 @@ export function AuthPage() {
                     htmlType="button"
                     type={selectedInterests.includes(interest) ? 'primary' : 'default'}
                     size="small"
-                    className="inline-flex items-center justify-center gap-1.5 rounded-full border border-[rgba(112,95,163,0.12)] px-3.5 py-2.5 text-[0.86rem] font-bold"
+                    className="inline-flex items-center justify-center gap-1.5 rounded-full px-3.5 py-2.5 text-[0.86rem] font-bold"
                     onClick={() => toggleInterest(interest)}
                   >
                     {interest}
@@ -151,7 +158,7 @@ export function AuthPage() {
               />
             </label>
 
-            <Button htmlType="submit" type="primary">
+            <Button htmlType="submit" type="primary" className="!w-full !shadow-[4px_4px_0_#2C2C2C]">
               Enter Bubbleverse
               <ArrowRight size={16} />
             </Button>

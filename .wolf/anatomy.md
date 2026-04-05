@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-04-05T16:28:16.413Z
-> Files: 84 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-04-05T16:30:25.161Z
+> Files: 86 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../../../Users/diarar/.claude/plans/
 
@@ -34,6 +34,8 @@
 - `Screenshot_2026-04-05_at_18.21.07-ccf4a58e-9461-40dd-952e-bf1f370ae3e4.png` (~19905 tok)
 - `Screenshot_2026-04-05_at_18.26.02-fcad1ce3-219a-4fbf-b683-1e009530f238.png` (~23873 tok)
 - `Screenshot_2026-04-05_at_18.27.49-01f948a7-bcc3-4da1-bc40-c02e83427f5b.png` (~4390 tok)
+- `Screenshot_2026-04-05_at_18.29.32-913302b9-2d8e-479d-b912-05799d96cba1.png` (~24051 tok)
+- `Screenshot_2026-04-05_at_18.29.38-d7ca0a42-b716-42a3-9ccb-829a5e57a621.png` (~26711 tok)
 
 ## ./
 
@@ -122,7 +124,7 @@
 
 ## src/pages/
 
-- `AuthPage.tsx` — AuthPage — renders form (~1959 tok)
+- `AuthPage.tsx` — AuthPage — renders form (~2091 tok)
 - `ChatPage.tsx` — ChatPage — renders form, modal (~2824 tok)
 - `ChatsPage.tsx` — formatRelativeTime (~1872 tok)
 - `CreatePage.tsx` — STEPS — renders form (~4803 tok)
