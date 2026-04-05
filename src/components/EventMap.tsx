@@ -4,15 +4,17 @@ import { divIcon, type LeafletMouseEvent } from 'leaflet';
 
 import { CATEGORY_META } from '../lib/constants';
 import type { Event, EventLocation } from '../types';
+import { cn } from '@/lib/utils';
 
 type EventMapProps = {
   events: Event[];
   userLocation: EventLocation;
   selectedEventId?: string | null;
-  onSelectEvent?: (eventId: string) => void;
+  onSelectEvent?: (eventId: string | null) => void;
   pickerLocation?: EventLocation;
   onPickLocation?: (location: EventLocation) => void;
   compact?: boolean;
+  fillHeight?: boolean;
   showZoomControl?: boolean;
 };
 
@@ -24,6 +26,7 @@ export function EventMap({
   pickerLocation,
   onPickLocation,
   compact = false,
+  fillHeight = false,
   showZoomControl = !compact,
 }: EventMapProps) {
   const selectedEvent = events.find((event) => event.id === selectedEventId);
@@ -31,7 +34,16 @@ export function EventMap({
   const centerPoint: [number, number] = [center.lat, center.lng];
 
   return (
-    <div className={`map-shell${compact ? ' map-shell--compact' : ''}`}>
+    <div
+      className={cn(
+        'overflow-hidden',
+        fillHeight
+          ? 'h-full min-h-0'
+          : compact
+            ? 'h-[220px]'
+            : 'h-[320px]',
+      )}
+    >
       <MapContainer
         center={centerPoint}
         zoom={14}
@@ -91,6 +103,10 @@ export function EventMap({
             onPickLocation={onPickLocation}
           />
         ) : null}
+
+        {onSelectEvent && !onPickLocation ? (
+          <MapSelectionHandler onSelectEvent={onSelectEvent} />
+        ) : null}
       </MapContainer>
     </div>
   );
@@ -100,6 +116,8 @@ function MapViewport({ center, compact }: { center: EventLocation; compact: bool
   const map = useMap();
 
   useEffect(() => {
+    // Leaflet needs an explicit resize pass when container dimensions change.
+    map.invalidateSize();
     map.flyTo([center.lat, center.lng], compact ? 14 : 14, {
       animate: true,
       duration: 0.7,
@@ -123,6 +141,20 @@ function MapPicker({
         lat: Number(event.latlng.lat.toFixed(5)),
         lng: Number(event.latlng.lng.toFixed(5)),
       });
+    },
+  });
+
+  return null;
+}
+
+function MapSelectionHandler({
+  onSelectEvent,
+}: {
+  onSelectEvent: (eventId: string | null) => void;
+}) {
+  useMapEvents({
+    click() {
+      onSelectEvent(null);
     },
   });
 

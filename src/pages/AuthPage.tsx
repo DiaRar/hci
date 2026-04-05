@@ -1,12 +1,7 @@
 import { ArrowRight, Compass, Shield, UserRound } from 'lucide-react';
+import { Button, Card, Input, Switch, Tag } from 'antd';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
 
 import { AppFrame } from '../components/AppFrame';
 import { Avatar } from '../components/Avatar';
@@ -46,45 +41,53 @@ export function AuthPage() {
   };
 
   return (
-    <AppFrame showNav={false}>
-      <main className="screen screen--auth">
-        <Card className="hero-card hero-card--auth">
-          <div className="hero-card__topline">
-            <Badge className="hero-pill">
+    <AppFrame>
+      <main className="flex-1 flex flex-col gap-4 p-5 pb-6">
+        <Card className="relative overflow-hidden p-5">
+          <div className="flex flex-wrap gap-[10px] mb-4">
+            <Tag className="m-0 inline-flex items-center gap-2 rounded-full bg-accent-purple-light px-3.5 py-2.5 text-[0.86rem] font-bold text-primary">
               <Compass size={14} />
               Nearby sports
-            </Badge>
-            <Badge variant="secondary" className="hero-pill hero-pill--subtle">
+            </Tag>
+            <Tag className="m-0 inline-flex items-center gap-2 px-3.5 py-2.5 rounded-full text-[0.86rem] font-bold bg-[rgba(255,212,150,0.22)] text-[#8d5f48]">
               <Shield size={14} />
               Text-only safety demo
-            </Badge>
+            </Tag>
           </div>
-          <h1>Sports near you, without guessing who will actually show up.</h1>
-          <p>{HERO_TAGLINES[0]}</p>
-          <div className="badge-row">
+          <h1 className="font-serif text-[2.3rem] leading-tight tracking-tight text-ink-strong dark:text-foreground">
+            Sports near you, without guessing who will actually show up.
+          </h1>
+          <p className="mt-2.5 text-[0.95rem] leading-relaxed text-muted-foreground">
+            {HERO_TAGLINES[0]}
+          </p>
+          <div className="flex flex-wrap gap-[10px] mt-4">
             {HIGHLIGHT_BADGES.map((badge) => (
-              <Badge key={badge} variant="outline" className="soft-badge">
+              <Tag
+                key={badge}
+                className="m-0 inline-flex items-center gap-1.5 rounded-full bg-white/70 px-3 py-2 text-[0.8rem] font-bold text-ink-strong dark:bg-white/20"
+              >
                 {badge}
-              </Badge>
+              </Tag>
             ))}
           </div>
         </Card>
 
-        <Card className="auth-card">
-          <div className="section-title">
+        <Card className="flex flex-col gap-4 p-4">
+          <div className="inline-flex items-center gap-2 text-[0.98rem] font-extrabold text-ink-strong dark:text-foreground">
             <UserRound size={16} />
             <span>Jump in fast</span>
           </div>
-          <p className="helper-copy">
+          <p className="text-[0.88rem] leading-relaxed text-muted-foreground">
             Use a demo profile or create one with a visible display name so people know who is joining the session.
           </p>
 
-          <div className="quick-user-list">
+          <div className="grid gap-[10px] my-4">
             {demoUsers.map((user) => (
-              <button
+              <Button
                 key={user.id}
-                className="quick-user"
-                type="button"
+                data-testid={`btn-demo-user-${user.id}`}
+                type="default"
+                className="h-auto justify-start text-left"
                 onClick={() =>
                   authenticate({
                     displayName: user.displayName,
@@ -94,17 +97,19 @@ export function AuthPage() {
                 }
               >
                 <Avatar user={user} />
-                <div>
-                  <strong>{user.displayName}</strong>
-                  <span>{user.interests.slice(0, 2).join(' · ')}</span>
+                <div className="flex flex-col gap-0.5">
+                  <strong className="text-ink-strong dark:text-foreground">{user.displayName}</strong>
+                  <span className="text-[0.84rem] text-muted-foreground">
+                    {user.interests.slice(0, 2).join(' · ')}
+                  </span>
                 </div>
-              </button>
+              </Button>
             ))}
           </div>
 
-          <form className="auth-form" onSubmit={handleSubmit}>
-            <label className="field">
-              <span className="field__label">Display name</span>
+          <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+            <label className="flex flex-col gap-2">
+              <span className="text-sm font-bold text-ink-strong dark:text-foreground">Display name</span>
               <Input
                 type="text"
                 placeholder="e.g. Noor"
@@ -114,19 +119,19 @@ export function AuthPage() {
               />
             </label>
 
-            <div className="field">
-              <div className="field__label-row">
-                <span className="field__label">Interests</span>
-                <span className="field__hint">Optional, but it improves your session feed.</span>
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-sm font-bold text-ink-strong dark:text-foreground">Interests</span>
+                <span className="text-[0.78rem] font-medium text-muted-foreground">Optional, but it improves your session feed.</span>
               </div>
-              <div className="chip-grid">
+              <div className="flex flex-wrap gap-[10px]">
                 {INTEREST_OPTIONS.map((interest) => (
                   <Button
                     key={interest}
-                    type="button"
-                    variant={selectedInterests.includes(interest) ? 'default' : 'outline'}
-                    size="sm"
-                    className="pill-button"
+                    htmlType="button"
+                    type={selectedInterests.includes(interest) ? 'primary' : 'default'}
+                    size="small"
+                    className="inline-flex items-center justify-center gap-1.5 rounded-full border border-[rgba(112,95,163,0.12)] px-3.5 py-2.5 text-[0.86rem] font-bold"
                     onClick={() => toggleInterest(interest)}
                   >
                     {interest}
@@ -135,18 +140,18 @@ export function AuthPage() {
               </div>
             </div>
 
-            <label className="switch-card">
+            <label className="grid grid-cols-[1fr_auto] items-center gap-3 p-4 rounded-[20px] border border-[rgba(112,95,163,0.14)] bg-white/68 dark:bg-white/10">
               <div>
-                <span className="field__label">Enable nearby discovery</span>
-                <p className="field__hint">Open map mode keeps nearby sports sessions visible in your discover feed.</p>
+                <span className="block text-sm font-bold text-ink-strong dark:text-foreground">Enable nearby discovery</span>
+                <p className="mt-0.5 text-[0.78rem] font-medium text-muted-foreground">Open map mode keeps nearby sports sessions visible in your discover feed.</p>
               </div>
               <Switch
                 checked={nearbyDiscoveryEnabled}
-                onCheckedChange={setNearbyDiscoveryEnabled}
+                onChange={setNearbyDiscoveryEnabled}
               />
             </label>
 
-            <Button className="primary-button" type="submit">
+            <Button htmlType="submit" type="primary">
               Enter Bubbleverse
               <ArrowRight size={16} />
             </Button>

@@ -2,19 +2,19 @@ import {
   ArrowRight,
   Clock3,
   Crosshair,
-  LogOut,
   MapPin,
+  MessageCircle,
   Plus,
   SlidersHorizontal,
   Users,
 } from 'lucide-react';
+import { Button, Card, Select, Tag } from 'antd';
 import { useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { AppFrame } from '../components/AppFrame';
 import { Avatar } from '../components/Avatar';
 import { EventMap } from '../components/EventMap';
-import type { DiscoverFilters } from '../components/FiltersBar';
 import { CATEGORY_META } from '../lib/constants';
 import {
   computeDistanceKm,
@@ -22,14 +22,14 @@ import {
   formatDistanceKm,
 } from '../lib/format';
 import { useBubbleStore } from '../store/BubbleStore';
-import { Badge } from '@/components/ui/badge';
-import { Button, buttonVariants } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import {
-  NativeSelect,
-  NativeSelectOption,
-} from '@/components/ui/native-select';
-import { cn } from '@/lib/utils';
+import type { CategoryId, CostFilter, SkillLevel, SortMode } from '../types';
+type DiscoverFilters = {
+  category: 'all' | CategoryId;
+  cost: CostFilter;
+  skill: 'all' | SkillLevel;
+  womenOnly: boolean;
+  sort: SortMode;
+};
 
 const initialFilters: DiscoverFilters = {
   category: 'all',
@@ -39,9 +39,14 @@ const initialFilters: DiscoverFilters = {
   sort: 'closest',
 };
 
+function hasReadableText(value: string): boolean {
+  return /[A-Za-z0-9]/.test(value);
+}
+
 export function DiscoverPage() {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { currentUser, events, userLocation, signOut } = useBubbleStore();
+  const { currentUser, events, userLocation } = useBubbleStore();
   const [filters, setFilters] = useState<DiscoverFilters>(initialFilters);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -90,90 +95,107 @@ export function DiscoverPage() {
     filteredEvents.find((event) => event.id === effectiveSelectedEventId) ?? null;
   const filterSummary =
     filters.category === 'all' ? 'All sports' : CATEGORY_META[filters.category].label;
+  const chatSendButtonStyle =
+    '!h-11 !w-11 !min-w-11 !rounded-full !p-0 !shadow-[4px_4px_0_#2C2C2C]';
 
   const clearFilters = () => {
     setFilters(initialFilters);
   };
 
+  const selectedEventTitle = selectedEvent
+    ? hasReadableText(selectedEvent.title)
+      ? selectedEvent.title
+      : `${CATEGORY_META[selectedEvent.category].label} session`
+    : '';
+  const selectedEventDescription = selectedEvent
+    ? hasReadableText(selectedEvent.description)
+      ? selectedEvent.description
+      : `Join this ${CATEGORY_META[selectedEvent.category].label.toLowerCase()} group and coordinate in chat.`
+    : '';
+
   return (
-    <AppFrame showNav={false}>
-      <main className="screen screen--discover">
-        <section className="discover-map-wrap">
+    <AppFrame>
+      <main className="flex min-h-0 flex-1 flex-col p-0">
+        <section className="relative min-h-0 flex-1">
           <EventMap
             events={filteredEvents}
             userLocation={userLocation}
             selectedEventId={selectedEvent?.id ?? null}
             onSelectEvent={setSelectedEventId}
+            fillHeight
             showZoomControl={false}
           />
 
-          <div className="discover-overlay discover-overlay--top">
-            <div className="discover-toolbar">
+          <div className="absolute left-0 right-0 top-0 z-[500] flex flex-col gap-3 p-4">
+            <div className="flex items-center justify-between gap-2">
               {currentUser ? (
-                <Link
-                  className={cn(
-                    buttonVariants({ variant: 'outline', size: 'icon' }),
-                    'discover-toolbar__icon',
-                  )}
-                  to="/profile/me"
+                <Button
+                  type="default"
+                  shape="circle"
+                  className={chatSendButtonStyle}
+                  htmlType="button"
+                  onClick={() => navigate('/profile/me')}
                   aria-label="Open profile"
                 >
                   <Avatar user={currentUser} size="md" />
-                </Link>
+                </Button>
               ) : (
-                <span className="discover-toolbar__icon discover-toolbar__icon--placeholder" />
+                <span className="h-11 w-11 rounded-full border border-border bg-[color:var(--surface-strong)]" />
               )}
 
-              <div className="discover-brand-pill">Bubbleverse</div>
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-accent-purple px-3.5 py-2 text-[0.82rem] font-bold text-white shadow-[var(--shadow-soft)]">
+                Bubbleverse
+              </div>
 
               <Button
-                variant="outline"
-                size="icon"
-                className="discover-toolbar__icon"
-                type="button"
-                onClick={signOut}
-                aria-label="Sign out"
+                type="default"
+                shape="circle"
+                className={chatSendButtonStyle}
+                htmlType="button"
+                onClick={() => navigate('/chats')}
+                aria-label="Open chats"
               >
-                <LogOut size={18} />
+                <MessageCircle size={18} />
               </Button>
             </div>
 
-            <div className="discover-filter-stack">
-              <Button
-                variant={filtersOpen ? 'secondary' : 'outline'}
-                className="discover-filter-chip"
-                type="button"
-                onClick={() => setFiltersOpen((current) => !current)}
-              >
-                <SlidersHorizontal size={15} />
-                <span>{filterSummary}</span>
-                <span className="discover-filter-chip__count">{filteredEvents.length}</span>
-              </Button>
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <Button
+                  type="default"
+                  htmlType="button"
+                  onClick={() => setFiltersOpen((current) => !current)}
+                >
+                  <SlidersHorizontal size={15} />
+                  <span>{filterSummary}</span>
+                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-accent-purple-light text-[0.72rem] font-bold text-primary">
+                    {filteredEvents.length}
+                  </span>
+                </Button>
+              </div>
 
               {filtersOpen ? (
-                <Card className="discover-filter-popover">
-                  <div className="discover-filter-popover__header">
+                <Card className="flex flex-col gap-4 rounded-2xl p-4">
+                  <div className="flex items-start justify-between gap-2">
                     <div>
-                      <p className="eyebrow">Filters</p>
-                      <h2>Tune the session feed.</h2>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Filters</p>
+                      <h2 className="text-base font-bold text-foreground mt-0.5">Tune the session feed.</h2>
                     </div>
                     <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-button"
-                      type="button"
+                      type="text"
+                      size="small"
+                      htmlType="button"
                       onClick={clearFilters}
                     >
                       Reset
                     </Button>
                   </div>
 
-                  <div className="discover-filter-pills">
+                  <div className="flex flex-wrap gap-2">
                     <Button
-                      variant={filters.category === 'all' ? 'default' : 'outline'}
-                      size="sm"
-                      className="pill-button"
-                      type="button"
+                      type={filters.category === 'all' ? 'primary' : 'default'}
+                      size="small"
+                      htmlType="button"
                       onClick={() =>
                         setFilters((current) => ({ ...current, category: 'all' }))
                       }
@@ -183,10 +205,9 @@ export function DiscoverPage() {
                     {Object.entries(CATEGORY_META).map(([id, meta]) => (
                       <Button
                         key={id}
-                        type="button"
-                        variant={filters.category === id ? 'default' : 'outline'}
-                        size="sm"
-                        className="pill-button"
+                        htmlType="button"
+                        type={filters.category === id ? 'primary' : 'default'}
+                        size="small"
                         onClick={() =>
                           setFilters((current) => ({
                             ...current,
@@ -200,53 +221,52 @@ export function DiscoverPage() {
                     ))}
                   </div>
 
-                  <div className="discover-filter-grid">
-                    <label className="field field--compact">
-                      <span className="field__label">Cost</span>
-                      <NativeSelect
-                        className="w-full"
+                  <div className="grid grid-cols-2 gap-3">
+                    <label className="flex flex-col gap-1.5">
+                      <span className="text-xs font-medium text-muted-foreground">Cost</span>
+                      <Select
                         value={filters.cost}
-                        onChange={(event) =>
+                        onChange={(val) =>
                           setFilters((current) => ({
                             ...current,
-                            cost: event.target.value as DiscoverFilters['cost'],
+                            cost: val as DiscoverFilters['cost'],
                           }))
                         }
-                      >
-                        <NativeSelectOption value="all">Any</NativeSelectOption>
-                        <NativeSelectOption value="free">Free</NativeSelectOption>
-                        <NativeSelectOption value="budget">Budget</NativeSelectOption>
-                        <NativeSelectOption value="premium">Premium</NativeSelectOption>
-                      </NativeSelect>
+                        options={[
+                          { value: 'all', label: 'Any' },
+                          { value: 'free', label: 'Free' },
+                          { value: 'budget', label: 'Budget' },
+                          { value: 'premium', label: 'Premium' },
+                        ]}
+                      />
                     </label>
 
-                    <label className="field field--compact">
-                      <span className="field__label">Skill</span>
-                      <NativeSelect
-                        className="w-full"
+                    <label className="flex flex-col gap-1.5">
+                      <span className="text-xs font-medium text-muted-foreground">Skill</span>
+                      <Select
                         value={filters.skill}
-                        onChange={(event) =>
+                        onChange={(val) =>
                           setFilters((current) => ({
                             ...current,
-                            skill: event.target.value as DiscoverFilters['skill'],
+                            skill: val as DiscoverFilters['skill'],
                           }))
                         }
-                      >
-                        <NativeSelectOption value="all">All</NativeSelectOption>
-                        <NativeSelectOption value="open">Open</NativeSelectOption>
-                        <NativeSelectOption value="beginner">Beginner</NativeSelectOption>
-                        <NativeSelectOption value="intermediate">Intermediate</NativeSelectOption>
-                        <NativeSelectOption value="advanced">Advanced</NativeSelectOption>
-                      </NativeSelect>
+                        options={[
+                          { value: 'all', label: 'All' },
+                          { value: 'open', label: 'Open' },
+                          { value: 'beginner', label: 'Beginner' },
+                          { value: 'intermediate', label: 'Intermediate' },
+                          { value: 'advanced', label: 'Advanced' },
+                        ]}
+                      />
                     </label>
                   </div>
 
-                  <div className="discover-filter-actions">
+                  <div className="flex flex-wrap gap-2">
                     <Button
-                      variant={filters.womenOnly ? 'default' : 'outline'}
-                      size="sm"
-                      className="pill-button"
-                      type="button"
+                      type={filters.womenOnly ? 'primary' : 'default'}
+                      size="small"
+                      htmlType="button"
                       onClick={() =>
                         setFilters((current) => ({
                           ...current,
@@ -258,10 +278,9 @@ export function DiscoverPage() {
                     </Button>
 
                     <Button
-                      variant={filters.sort === 'closest' ? 'default' : 'outline'}
-                      size="sm"
-                      className="pill-button"
-                      type="button"
+                      type={filters.sort === 'closest' ? 'primary' : 'default'}
+                      size="small"
+                      htmlType="button"
                       onClick={() =>
                         setFilters((current) => ({
                           ...current,
@@ -278,82 +297,95 @@ export function DiscoverPage() {
           </div>
 
           {selectedEvent ? (
-            <div className="discover-overlay discover-overlay--bottom">
-              <Link className="discover-event-preview" to={`/event/${selectedEvent.id}`}>
-                <div className="discover-event-preview__main">
-                  <Badge
-                    className="category-token"
-                    style={{
-                      background: CATEGORY_META[selectedEvent.category].glow,
-                      color: CATEGORY_META[selectedEvent.category].accent,
-                    }}
-                  >
-                    <span>{CATEGORY_META[selectedEvent.category].emoji}</span>
-                    {CATEGORY_META[selectedEvent.category].label}
-                  </Badge>
+            <div className="absolute bottom-0 left-0 right-0 z-[700] p-3">
+              <Card
+                hoverable
+                className="w-full rounded-2xl"
+                onClick={() => navigate(`/event/${selectedEvent.id}`)}
+                styles={{ body: { padding: 14 } }}
+              >
+                <div className="flex items-center gap-3 text-left">
+                  <div className="flex min-w-0 flex-1 flex-col gap-2">
+                    <Tag
+                      className="inline-flex items-center gap-1.5 self-start px-2.5 py-1 rounded-full text-[0.78rem] font-bold"
+                      style={{
+                        background: CATEGORY_META[selectedEvent.category].glow,
+                        color: CATEGORY_META[selectedEvent.category].accent,
+                      }}
+                    >
+                      <span>{CATEGORY_META[selectedEvent.category].emoji}</span>
+                      {CATEGORY_META[selectedEvent.category].label}
+                    </Tag>
 
-                  <div className="discover-event-preview__copy">
-                    <h2>{selectedEvent.title}</h2>
-                    <div className="discover-event-preview__meta">
-                      <span>
-                        <Clock3 size={13} />
-                        {formatClock(selectedEvent.startTime)}
-                      </span>
-                      <span>
-                        <Users size={13} />
-                        {selectedEvent.attendeeIds.length}
-                      </span>
-                      <span>
-                        <MapPin size={13} />
-                        {formatDistanceKm(
-                          computeDistanceKm(userLocation, selectedEvent.location),
-                        )}
-                      </span>
+                    <div className="flex min-w-0 flex-col gap-1">
+                      <h2 className="truncate text-base font-bold text-foreground">{selectedEventTitle}</h2>
+                      <p className="truncate text-xs text-muted-foreground">{selectedEventDescription}</p>
+                      <div className="flex items-center gap-3 text-[0.8rem] text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <Clock3 size={13} />
+                          {formatClock(selectedEvent.startTime)}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Users size={13} />
+                          {selectedEvent.attendeeIds.length}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <MapPin size={13} />
+                          {formatDistanceKm(
+                            computeDistanceKm(userLocation, selectedEvent.location),
+                          )}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <span className="discover-event-preview__action">
-                  <ArrowRight size={16} />
-                </span>
-              </Link>
+                  <Button
+                    type="primary"
+                    shape="circle"
+                    className="!h-10 !w-10 !min-w-10 !rounded-full !p-0 !shadow-[4px_4px_0_#2C2C2C] shrink-0"
+                    icon={<ArrowRight size={16} />}
+                  />
+                </div>
+              </Card>
             </div>
           ) : filteredEvents.length === 0 ? (
-            <div className="discover-overlay discover-overlay--bottom">
-              <Card className="discover-empty-card">
-                <h2>No sessions match these filters.</h2>
-                <p>Reset the filters or launch a new session from the map.</p>
+            <div className="absolute bottom-0 left-0 right-0 z-[700] p-3">
+              <Card className="flex flex-col items-center justify-center gap-2 rounded-2xl p-6 text-center">
+                <h2 className="text-base font-bold text-foreground">No sessions match these filters.</h2>
+                <p className="text-sm text-muted-foreground">Reset the filters or launch a new session from the map.</p>
               </Card>
             </div>
           ) : (
-            <div className="discover-overlay discover-overlay--bottom">
-              <div className="discover-hint-pill">
-                Tap a pin to preview the session.
+            <div className="absolute bottom-0 left-0 right-0 z-[700] p-3">
+              <div className="flex items-center justify-center">
+                <Tag className="m-0 inline-flex items-center gap-2 rounded-full border border-border bg-[color:var(--surface-strong)] px-4 py-2 text-sm font-medium text-muted-foreground">
+                  Tap a pin to preview, or tap map to clear.
+                </Tag>
               </div>
             </div>
           )}
 
-          <div className="discover-fab-stack">
-            <Link
-              className={cn(
-                buttonVariants({ size: 'icon-lg' }),
-                'discover-fab discover-fab--primary',
-              )}
-              to="/create"
-              aria-label="Create event"
-            >
-              <Plus size={26} />
-            </Link>
+          <div
+            className="absolute bottom-6 right-4 z-[600] flex flex-col gap-3"
+          >
             <Button
-              variant="outline"
-              size="icon-lg"
-              className="discover-fab discover-fab--secondary"
-              type="button"
+              type="primary"
+              shape="circle"
+              className="!inline-flex !h-14 !w-14 !min-w-14 !items-center !justify-center !rounded-full !p-0 !shadow-[4px_4px_0_#2C2C2C]"
+              htmlType="button"
+              onClick={() => navigate('/create')}
+              aria-label="Create event"
+              icon={<Plus size={26} />}
+            />
+            <Button
+              type="default"
+              shape="circle"
+              className="!inline-flex !h-[52px] !w-[52px] !min-w-[52px] !items-center !justify-center !rounded-full !p-0 !shadow-[4px_4px_0_#2C2C2C]"
+              htmlType="button"
               onClick={() => setSelectedEventId(null)}
-              aria-label="Center on your location"
-            >
-              <Crosshair size={20} />
-            </Button>
+              aria-label="Clear selected session preview"
+              icon={<Crosshair size={22} style={{ transform: 'translateY(1px)' }} />}
+            />
           </div>
         </section>
       </main>

@@ -1,33 +1,27 @@
-import type { CSSProperties } from 'react';
-
-import {
-  Avatar as UiAvatar,
-  AvatarFallback,
-  AvatarGroup,
-  AvatarGroupCount,
-} from '@/components/ui/avatar';
-
-import { getInitials } from '../lib/format';
-import type { User } from '../types';
+import type { CSSProperties } from "react";
+import { Avatar as AntAvatar } from "antd";
+import { getInitials } from "../lib/format";
+import type { User } from "../types";
 
 type AvatarProps = {
   user: User;
-  size?: 'sm' | 'md' | 'lg';
+  size?: "sm" | "md" | "lg";
 };
 
-export function Avatar({ user, size = 'md' }: AvatarProps) {
+export function Avatar({ user, size = "md" }: AvatarProps) {
+  const initials = getInitials(user.displayName);
   return (
-    <UiAvatar
-      size={size === 'lg' ? 'lg' : size === 'sm' ? 'sm' : 'default'}
-      className={`avatar avatar--${size}`}
-      style={{ '--avatar-color': user.avatarPreset } as CSSProperties}
-      aria-label={user.displayName}
-      title={user.displayName}
-    >
-      <AvatarFallback className="avatar__fallback">
-        {getInitials(user.displayName)}
-      </AvatarFallback>
-    </UiAvatar>
+    <span title={user.displayName}>
+      <AntAvatar
+        size={size === "sm" ? 24 : size === "md" ? 32 : 40}
+        style={{
+          backgroundColor: `color-mix(in srgb, ${user.avatarPreset} 20%, white)`,
+          color: `color-mix(in srgb, ${user.avatarPreset} 72%, black)`,
+        } as CSSProperties}
+      >
+        {initials}
+      </AntAvatar>
+    </span>
   );
 }
 
@@ -37,19 +31,27 @@ type AvatarStackProps = {
 };
 
 export function AvatarStack({ users, limit = 3 }: AvatarStackProps) {
-  const visibleUsers = users.slice(0, limit);
-  const extraCount = Math.max(users.length - visibleUsers.length, 0);
-
   return (
-    <AvatarGroup className="avatar-stack">
-      {visibleUsers.map((user) => (
-        <Avatar key={user.id} user={user} size="sm" />
+    <AntAvatar.Group
+      max={{
+        count: limit,
+        style: {
+          backgroundColor: 'var(--muted)',
+          color: 'var(--muted-foreground)',
+          width: 24,
+          height: 24,
+          minWidth: 24,
+          fontSize: 12,
+          fontWeight: 700,
+          lineHeight: '24px',
+        },
+      }}
+    >
+      {users.map((user) => (
+        <span key={user.id} className="rounded-full ring-2 ring-background">
+          <Avatar user={user} size="sm" />
+        </span>
       ))}
-      {extraCount > 0 ? (
-        <AvatarGroupCount className="avatar avatar--sm avatar--ghost">
-          +{extraCount}
-        </AvatarGroupCount>
-      ) : null}
-    </AvatarGroup>
+    </AntAvatar.Group>
   );
 }

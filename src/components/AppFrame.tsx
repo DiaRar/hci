@@ -1,26 +1,15 @@
 import { ChevronLeft } from 'lucide-react';
-import type { PropsWithChildren, ReactNode } from 'react';
+import { Button as AntButton } from 'antd';
+import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 
-import { buttonVariants } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-
-import { BottomNav } from './BottomNav';
-
-type AppFrameProps = PropsWithChildren<{
-  showNav?: boolean;
-}>;
-
-export function AppFrame({ children, showNav = true }: AppFrameProps) {
+export function AppFrame({ children }: { children: ReactNode }) {
   return (
     <div className="page-scaffold">
       <div className="page-scaffold__orb page-scaffold__orb--left" />
       <div className="page-scaffold__orb page-scaffold__orb--right" />
       <div className="app-device">
-        <div className="app-device__screen">
-          {children}
-          {showNav ? <BottomNav /> : null}
-        </div>
+        <div className="app-device__screen">{children}</div>
       </div>
     </div>
   );
@@ -35,29 +24,30 @@ type PageHeaderProps = {
 
 export function PageHeader({ title, subtitle, backTo, action }: PageHeaderProps) {
   return (
-    <header className="page-header">
-      <div className="page-header__main">
+    <header className="flex items-center justify-between gap-3 pb-1">
+      <div className="flex-1 flex items-center gap-3">
         {backTo ? (
           <Link
-            className={cn(
-              buttonVariants({ variant: 'outline', size: 'icon' }),
-              'page-header__back',
-            )}
+            className="shrink-0"
             to={backTo}
             aria-label="Go back"
           >
-            <ChevronLeft size={18} />
+            <AntButton shape="circle" icon={<ChevronLeft size={18} />} />
           </Link>
         ) : (
-          <span className="page-header__back page-header__back--placeholder" aria-hidden="true" />
+          <span className="h-10 w-10 shrink-0" aria-hidden="true" />
         )}
         <div>
-          <p className="eyebrow">Bubbleverse</p>
-          <h1>{title}</h1>
-          {subtitle ? <p className="page-header__subtitle">{subtitle}</p> : null}
+          <p className="text-[0.68rem] font-bold uppercase tracking-[0.16em] text-muted-foreground">
+            Bubbleverse
+          </p>
+          <h1 className="text-[2rem]">{title}</h1>
+          {subtitle ? (
+            <p className="text-sm leading-relaxed text-muted-foreground">{subtitle}</p>
+          ) : null}
         </div>
       </div>
-      {action ? <div className="page-header__action">{action}</div> : null}
+      {action ? <div className="shrink-0">{action}</div> : null}
     </header>
   );
 }

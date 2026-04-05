@@ -1,0 +1,307 @@
+{
+  "version": 1,
+  "bugs": [
+    {
+      "id": "bug-001",
+      "timestamp": "2026-04-03T13:02:20.375Z",
+      "error_message": "CSS fix: hover",
+      "file": "src/components/BottomNav.tsx",
+      "root_cause": "hover: text-foreground', → text-foreground py-1 rounded-lg',",
+      "fix": "Changed hover: text-foreground', → text-foreground py-1 rounded-lg',",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-03T13:02:20.375Z"
+    },
+    {
+      "id": "bug-002",
+      "timestamp": "2026-04-03T13:58:19.188Z",
+      "error_message": "Significant refactor of ",
+      "file": "../../../Users/diarar/.claude/plans/buzzing-mapping-orbit.md",
+      "root_cause": "35 lines replaced/restructured",
+      "fix": "Rewrote 62→89 lines (35 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-03T13:58:19.188Z"
+    },
+    {
+      "id": "bug-003",
+      "timestamp": "2026-04-05T13:43:53.814Z",
+      "error_message": "Missing import: ./styles/components.css",
+      "file": "src/index.css",
+      "root_cause": "Module(s) not imported: ./styles/components.css",
+      "fix": "Added import(s) for ./styles/components.css",
+      "tags": [
+        "auto-detected",
+        "missing-import",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-05T13:43:53.814Z"
+    },
+    {
+      "id": "bug-004",
+      "timestamp": "2026-04-05T13:44:44.772Z",
+      "error_message": "CSS fix: width, height, border-radius",
+      "file": "src/styles/components.css",
+      "root_cause": "width: 2.25rem → 3rem; height: 2.25rem → 3rem; border-radius: calc(var(--radius) * 0.85) → calc(var(--radius) * 1.1)",
+      "fix": "Changed width: 2.25rem → 3rem; height: 2.25rem → 3rem; border-radius: calc(var(--radius) * 0.85) → calc(var(--radius) * 1.1)",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-05T13:44:44.772Z"
+    },
+    {
+      "id": "bug-005",
+      "timestamp": "2026-04-05T13:51:00.167Z",
+      "error_message": "Significant refactor of ",
+      "file": "src/styles/components.css",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 18→31 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-05T13:51:00.167Z"
+    },
+    {
+      "id": "bug-006",
+      "timestamp": "2026-04-05T17:47:00.000Z",
+      "error_message": "The + button is not circular",
+      "file": "src/pages/DiscoverPage.tsx",
+      "root_cause": "The floating action button relied on regular button sizing and child content, so the Ant Design themed button root stretched the circle into an oval.",
+      "fix": "Converted the FABs to explicit icon-only Ant Design buttons with fixed height, width, min-width, and zero padding.",
+      "tags": [
+        "ui",
+        "button",
+        "discover",
+        "antd",
+        "fab"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-05T17:47:00.000Z"
+    },
+    {
+      "id": "bug-007",
+      "timestamp": "2026-04-05T17:54:00.000Z",
+      "error_message": "Chats page looks broken; composer layout is not normal and send button shadow is missing",
+      "file": "src/pages/ChatPage.tsx",
+      "root_cause": "Ant Design Card wraps children in an internal body, so flex classes on the Card root did not align input and send button; send button also lacked explicit illustration shadow style in this context.",
+      "fix": "Replaced composer Card wrapper with a dedicated inline row container, made send action icon-only circular button, and added explicit illustration-style box shadow while keeping AntD primitives.",
+      "tags": [
+        "ui",
+        "chat",
+        "layout",
+        "antd-card",
+        "button-shadow"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-05T17:54:00.000Z"
+    },
+    {
+      "id": "bug-008",
+      "timestamp": "2026-04-05T18:03:00.000Z",
+      "error_message": "Chats list page looks ugly and not production ready",
+      "file": "src/pages/ChatsPage.tsx",
+      "root_cause": "Chat list cards had weak hierarchy (oversized titles, inconsistent metadata rows), no fallback for malformed titles, and no ordering by latest activity.",
+      "fix": "Redesigned list cards with clearer typography and spacing, added safe title fallback, added latest-activity sorting, tightened preview text behavior, and standardized attendee tags.",
+      "tags": [
+        "ui",
+        "chats",
+        "typography",
+        "layout",
+        "production-polish"
+      ],
+      "related_bugs": [
+        "bug-007"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-04-05T18:03:00.000Z"
+    },
+    {
+      "id": "bug-009",
+      "timestamp": "2026-04-05T18:11:00.000Z",
+      "error_message": "Discover buttons should match chat send button style; chats page has overly pink cards and oversized +1 overflow badge",
+      "file": "src/pages/DiscoverPage.tsx",
+      "root_cause": "Discover icon buttons used mixed sizing/shadow styles, Card theme color leaned too pink for list surfaces, and Avatar.Group overflow badge inherited oversized default typography.",
+      "fix": "Unified Discover icon button classes with the chat send button style, changed Card theme background to a neutral cream, and explicitly constrained Avatar.Group overflow badge size and font.",
+      "tags": [
+        "ui",
+        "discover",
+        "theme",
+        "avatar-group",
+        "consistency"
+      ],
+      "related_bugs": [
+        "bug-006",
+        "bug-008"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-04-05T18:11:00.000Z"
+    },
+    {
+      "id": "bug-010",
+      "timestamp": "2026-04-05T18:17:00.000Z",
+      "error_message": "Floating Discover + and crosshair icons are too small and not visually centered",
+      "file": "src/pages/DiscoverPage.tsx",
+      "root_cause": "Floating action buttons used smaller icon sizes and insufficient enforced centering for icon-only controls under the illustration button styling.",
+      "fix": "Increased both floating button sizes and icon sizes, and forced inline-flex centering with explicit width/min-width/padding constraints.",
+      "tags": [
+        "ui",
+        "discover",
+        "floating-actions",
+        "icon-alignment"
+      ],
+      "related_bugs": [
+        "bug-006",
+        "bug-009"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-04-05T18:17:00.000Z"
+    },
+    {
+      "id": "bug-011",
+      "timestamp": "2026-04-05T18:24:00.000Z",
+      "error_message": "Create flow select looked broken and the full flow felt non-production",
+      "file": "src/pages/CreatePage.tsx",
+      "root_cause": "Step-0 select lacked explicit full-width sizing and the flow lacked consistent spacing, section hierarchy, and a stable mobile action footer.",
+      "fix": "Redesigned CreatePage step cards with clearer hierarchy, made sport select full-width and large, improved copy and spacing across all steps, and added a sticky production-style action footer.",
+      "tags": [
+        "ui",
+        "create-flow",
+        "select",
+        "production-polish",
+        "layout"
+      ],
+      "related_bugs": [
+        "bug-008",
+        "bug-009"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-04-05T18:24:00.000Z"
+    },
+    {
+      "id": "bug-012",
+      "timestamp": "2026-04-05T18:32:00.000Z",
+      "error_message": "Profile page is not production-level (cluttered editor, noisy session cards, weak danger-zone layout)",
+      "file": "src/pages/ProfilePage.tsx",
+      "root_cause": "Profile editing controls and session sections used dense, inconsistent layout patterns and reused a heavy event card not optimized for profile context.",
+      "fix": "Reworked profile summary and editor hierarchy, converted interests to grouped checkbox grids, tightened danger-zone actions, and replaced hosted/joined blocks with compact profile-specific session cards including malformed-title fallback.",
+      "tags": [
+        "ui",
+        "profile",
+        "production-polish",
+        "forms",
+        "cards"
+      ],
+      "related_bugs": [
+        "bug-008",
+        "bug-011"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-04-05T18:32:00.000Z"
+    },
+    {
+      "id": "bug-013",
+      "timestamp": "2026-04-05T18:40:00.000Z",
+      "error_message": "Session details page not production-level; stats layout collapsed and malformed title/description leaked into UI",
+      "file": "src/pages/EventPage.tsx",
+      "root_cause": "Card-root utility layout classes were used where AntD Card body wrappers controlled content layout; raw event text without guardrails surfaced placeholder punctuation values.",
+      "fix": "Moved key layouts into explicit inner wrappers, reworked details/session setup cards, added text readability fallbacks for title/description/safety note, and tightened action styling for a cleaner production surface.",
+      "tags": [
+        "ui",
+        "event-page",
+        "card-layout",
+        "fallback-text",
+        "production-polish"
+      ],
+      "related_bugs": [
+        "bug-007",
+        "bug-011"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-04-05T18:40:00.000Z"
+    },
+    {
+      "id": "bug-014",
+      "timestamp": "2026-04-05T18:48:00.000Z",
+      "error_message": "Discover selected-event map tray shows malformed content and map interactions feel rough",
+      "file": "src/pages/DiscoverPage.tsx",
+      "root_cause": "Selected event preview lacked fallback text handling and map interactions had no deselect affordance when tapping empty map space.",
+      "fix": "Added safe title/description fallbacks in selected tray, improved tray card body formatting, enabled map click to clear selection via EventMap selection handler, and updated helper copy.",
+      "tags": [
+        "ui",
+        "discover",
+        "map-interactions",
+        "fallback-text",
+        "production-polish"
+      ],
+      "related_bugs": [
+        "bug-006",
+        "bug-013"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-04-05T18:48:00.000Z"
+    },
+    {
+      "id": "bug-015",
+      "timestamp": "2026-04-05T18:55:00.000Z",
+      "error_message": "Selected-event tray should overlay floating buttons instead of pushing them upward",
+      "file": "src/pages/DiscoverPage.tsx",
+      "root_cause": "Floating action button container used dynamic bottom offsets tied to tray state, and tray layering sat below actions.",
+      "fix": "Pinned floating actions to a fixed bottom position and raised bottom tray z-index above action stack so tray covers actions when shown.",
+      "tags": [
+        "ui",
+        "discover",
+        "layering",
+        "floating-actions",
+        "map-tray"
+      ],
+      "related_bugs": [
+        "bug-006",
+        "bug-014"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-04-05T18:55:00.000Z"
+    },
+    {
+      "id": "bug-016",
+      "timestamp": "2026-04-05T19:01:00.000Z",
+      "error_message": "Crosshair icon in Discover floating button appears too high and not centered",
+      "file": "src/pages/DiscoverPage.tsx",
+      "root_cause": "Icon optical center sat above the button's geometric center under current icon metrics and stroke weight.",
+      "fix": "Applied a small downward transform to the crosshair icon in the floating action button for visual centering.",
+      "tags": [
+        "ui",
+        "discover",
+        "icon-alignment",
+        "floating-actions"
+      ],
+      "related_bugs": [
+        "bug-010",
+        "bug-015"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-04-05T19:01:00.000Z"
+    }
+  ]
+}

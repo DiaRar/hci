@@ -1,6 +1,59 @@
+/**
+ * Bubbleverse Mock Data
+ *
+ * This module contains the initial state for the application - demo users,
+ * events, and messages that populate the app on first load (or after
+ * localStorage is cleared).
+ *
+ * ============================================================================
+ * DESIGN DECISIONS
+ * ============================================================================
+ *
+ * Time-based data:
+ * - All event start times are generated relative to "now" using buildFutureDate()
+ *   This ensures the demo always shows upcoming events, never past ones.
+ * - Messages use buildRecentDate() to show realistic conversation timestamps.
+ *
+ * Realistic scenarios:
+ * - Each user has a distinct personality reflected in their bio and interests
+ * - Events span different sports, price points, skill levels, and timing
+ * - A "flagged" message demonstrates the demo moderation system
+ * - Some users have trustFlags.noShowStrikes or trustFlags.reportCount > 0
+ *   to demonstrate the trust system UI
+ *
+ * Geographic clustering:
+ * - All events are clustered around TU Delft (51.9979, 4.3658) in Delft, Netherlands
+ * - This creates a realistic "nearby" discovery experience
+ * - In production, you'd pull real venues from an API
+ *
+ * ============================================================================
+ * DATA STRUCTURE
+ * ============================================================================
+ *
+ * The mock data mirrors what would come from a real backend:
+ * - Users are fully fleshed out with profiles
+ * - Events reference user IDs (hostId, attendeeIds) not full objects
+ * - Messages are scoped to events (eventId) not direct user-to-user
+ *
+ * This shape matches the BubbleState type defined in types.ts
+ */
+
 import { CATEGORY_META } from '../lib/constants';
 import type { AttendanceStatus, BubbleState, Event, Message, User } from '../types';
 
+// ============================================================================
+// HELPERS - Date Building
+// ============================================================================
+
+/**
+ * Generate a future date ISO string.
+ * Used for event start times that are relative to "today".
+ *
+ * @param dayOffset - Days from today (0 = today, 1 = tomorrow)
+ * @param hour - Hour in 24h format
+ * @param minute - Minutes
+ * @returns ISO date string
+ */
 function buildFutureDate(dayOffset: number, hour: number, minute: number) {
   const date = new Date();
   date.setDate(date.getDate() + dayOffset);
@@ -8,10 +61,26 @@ function buildFutureDate(dayOffset: number, hour: number, minute: number) {
   return date.toISOString();
 }
 
+/**
+ * Generate a past date ISO string relative to now.
+ * Used for message timestamps that show realistic "X hours ago" formatting.
+ *
+ * @param hoursAgo - How many hours in the past
+ * @param minuteOffset - Additional minutes to subtract
+ * @returns ISO date string
+ */
 function buildRecentDate(hoursAgo: number, minuteOffset = 0) {
   return new Date(Date.now() - hoursAgo * 60 * 60_000 - minuteOffset * 60_000).toISOString();
 }
 
+/**
+ * Build attendance counts object from a statuses map.
+ * This is the inverse of what recalculateAttendanceCounts() does in the store -
+ * it's used to initialize event data with the correct counts.
+ *
+ * @param statuses - Map of userId -> AttendanceStatus
+ * @returns Record with counts for each status
+ */
 function buildAttendanceCounts(statuses: Record<string, AttendanceStatus>) {
   return {
     interested: Object.values(statuses).filter((status) => status === 'interested').length,
@@ -20,6 +89,20 @@ function buildAttendanceCounts(statuses: Record<string, AttendanceStatus>) {
   };
 }
 
+// ============================================================================
+// DEMO USERS
+// ============================================================================
+
+/**
+ * Five demo users with varied profiles, interests, and trust histories.
+ *
+ * Notable patterns:
+ * - user-iulia: verifiedHost=true (organizes sessions), friends with Rares and Miruna
+ * - user-rares: verifiedHost=true, friends with Iulia and Calin
+ * - user-calin: has 1 noShowStrike (demonstrates the strikes UI)
+ * - user-miruna: has 1 reportCount (demonstrates the reports UI)
+ * - user-alina: verifiedHost=true, friends with Calin and Miruna
+ */
 const users: User[] = [
   {
     id: 'user-iulia',
@@ -63,6 +146,7 @@ const users: User[] = [
     avatarPreset: '#0f8d84',
     friends: ['user-rares', 'user-alina'],
     trustFlags: {
+      // Calin has 1 no-show strike - demonstrates the strikes badge on profile
       verifiedHost: false,
       noShowStrikes: 1,
       reportCount: 0,
@@ -95,6 +179,7 @@ const users: User[] = [
     avatarPreset: '#5f7cff',
     friends: ['user-iulia', 'user-alina'],
     trustFlags: {
+      // Miruna has 1 report - demonstrates the report count badge
       verifiedHost: false,
       noShowStrikes: 0,
       reportCount: 1,
@@ -103,6 +188,23 @@ const users: User[] = [
   },
 ];
 
+// ============================================================================
+// DEMO EVENTS
+// ============================================================================
+
+/**
+ * Six demo events spanning different sports, timing, and configurations.
+ *
+ * Event selection for variety:
+ * - event-tennis: women-only, beginner, has 'here' attendees (live now feeling)
+ * - event-padel: open level, near-term, mixed statuses
+ * - event-football: tomorrow, lowest price
+ * - event-basketball: tonight, intermediate timing
+ * - event-running: very early morning (hardcoded 7:15 AM)
+ * - event-training: highest price, demonstration of equipment/facilities
+ *
+ * All events are within ~500m of each other (TU Delft campus)
+ */
 const events: Event[] = [
   {
     id: 'event-tennis',
@@ -117,6 +219,7 @@ const events: Event[] = [
       lat: 51.9978,
       lng: 4.3654,
     },
+    // Today at 18:30 - good evening slot
     startTime: buildFutureDate(0, 18, 30),
     durationMinutes: 90,
     price: 12,
@@ -124,6 +227,8 @@ const events: Event[] = [
     womenOnly: true,
     requiredEquipment: ['Tennis racket', 'Water bottle'],
     extraFacilities: ['Lockers', 'Showers'],
+    // Alina (host), Iulia (on_my_way), Miruna (here)
+    // The 'here' status makes it feel like people are already there
     attendeeIds: ['user-alina', 'user-iulia', 'user-miruna'],
     attendanceStatuses: {
       'user-alina': 'interested',
@@ -152,6 +257,7 @@ const events: Event[] = [
       lat: 51.9975,
       lng: 4.3658,
     },
+    // Today at 17:45 - slightly earlier afternoon
     startTime: buildFutureDate(0, 17, 45),
     durationMinutes: 75,
     price: 10,
@@ -187,9 +293,10 @@ const events: Event[] = [
       lat: 51.9986,
       lng: 4.3672,
     },
+    // Tomorrow at 19:00 - evening slot next day
     startTime: buildFutureDate(1, 19, 0),
     durationMinutes: 80,
-    price: 6,
+    price: 6, // Budget-friendly
     skillLevel: 'open',
     womenOnly: false,
     requiredEquipment: ['Football boots', 'Water bottle'],
@@ -224,6 +331,7 @@ const events: Event[] = [
       lat: 51.9982,
       lng: 4.3664,
     },
+    // Today at 20:00 - late evening
     startTime: buildFutureDate(0, 20, 0),
     durationMinutes: 70,
     price: 8,
@@ -259,9 +367,10 @@ const events: Event[] = [
       lat: 52.0008,
       lng: 4.3708,
     },
+    // Today at 07:15 - early morning run (hardcoded for demo variety)
     startTime: buildFutureDate(0, 7, 15),
     durationMinutes: 50,
-    price: 0,
+    price: 0, // Free
     skillLevel: 'intermediate',
     womenOnly: false,
     requiredEquipment: ['Running shoes', 'Water bottle'],
@@ -296,9 +405,10 @@ const events: Event[] = [
       lat: 51.9977,
       lng: 4.3661,
     },
+    // Tomorrow at 18:15 - early evening tomorrow
     startTime: buildFutureDate(1, 18, 15),
     durationMinutes: 60,
-    price: 14,
+    price: 14, // Highest price - premium session
     skillLevel: 'open',
     womenOnly: false,
     requiredEquipment: ['Resistance band', 'Water bottle'],
@@ -320,6 +430,25 @@ const events: Event[] = [
   },
 ];
 
+// ============================================================================
+// DEMO MESSAGES
+// ============================================================================
+
+/**
+ * Sample chat messages across different events.
+ *
+ * Demonstrates:
+ * - Natural conversation flow (questions, confirmations)
+ * - Realistic timing (some events have more chat activity)
+ * - Demo moderation: one message is flagged (contains "pills" keyword)
+ *
+ * Message timing:
+ * - event-padel has 2 messages, recent (2h and 1h58m ago)
+ * - event-tennis has 1 message, older (5h ago)
+ * - event-basketball has 1 FLAGGED message (4h43m ago) - demo moderation demo
+ * - event-football has 1 message, very recent (1h35m ago)
+ * - event-running has 1 message, oldest (8h ago)
+ */
 const messages: Message[] = [
   {
     id: 'message-1',
@@ -349,6 +478,7 @@ const messages: Message[] = [
     id: 'message-4',
     eventId: 'event-basketball',
     senderId: 'user-calin',
+    // This message gets flagged by demo moderation (contains "pills")
     text: 'Anyone want to buy pills after the run?',
     createdAt: buildRecentDate(4, 43),
     demoModerationState: 'flagged',
@@ -371,9 +501,24 @@ const messages: Message[] = [
   },
 ];
 
+// ============================================================================
+// INITIAL STATE
+// ============================================================================
+
+/**
+ * The complete initial state for the application.
+ * This is loaded on first visit or when localStorage is cleared.
+ *
+ * Default values:
+ * - currentUserId: null (no one logged in)
+ * - lastCreatedEventId: null (no events created yet)
+ * - userLocation: TU Delft campus (realistic demo location)
+ * - reports: empty array (no safety reports yet)
+ */
 export const initialBubbleState: BubbleState = {
   currentUserId: null,
   lastCreatedEventId: null,
+  // Mock user location - in production would use navigator.geolocation
   userLocation: {
     label: 'X TU Delft',
     lat: 51.9979,
@@ -385,6 +530,13 @@ export const initialBubbleState: BubbleState = {
   reports: [],
 };
 
+/**
+ * Recalculate attendance counts from a statuses map.
+ * Exported for use in BubbleStore when mutating attendance.
+ *
+ * @param statuses - Map of userId -> AttendanceStatus
+ * @returns Record with counts for interested, on_my_way, and here
+ */
 export function recalculateAttendanceCounts(statuses: Record<string, AttendanceStatus>) {
   return buildAttendanceCounts(statuses);
 }

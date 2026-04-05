@@ -1,12 +1,17 @@
 import { Clock3, Flag, Gauge, MapPin, ShieldAlert, Users } from 'lucide-react';
+import { Card, Flex, Tag, Typography } from 'antd';
 import { Link } from 'react-router-dom';
 
-import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
 import { CATEGORY_META } from '../lib/constants';
-import { computeDistanceKm, formatAttendanceStatus, formatCurrency, formatDistanceKm, formatEventWindow } from '../lib/format';
+import {
+  computeDistanceKm,
+  formatAttendanceStatus,
+  formatCurrency,
+  formatDistanceKm,
+  formatEventWindow,
+} from '../lib/format';
 import { useBubbleStore } from '../store/BubbleStore';
 import { AvatarStack } from './Avatar';
 import type { Event } from '../types';
@@ -24,14 +29,22 @@ export function EventCard({ event, selected = false }: EventCardProps) {
     .map((userId) => users.find((user) => user.id === userId))
     .filter((user): user is NonNullable<typeof user> => Boolean(user));
   const distance = computeDistanceKm(userLocation, event.location);
-  const currentStatus = currentUserId ? event.attendanceStatuses[currentUserId] : undefined;
+  const currentStatus = currentUserId
+    ? event.attendanceStatuses[currentUserId]
+    : undefined;
 
   return (
-    <Link className="event-card-link" to={`/event/${event.id}`}>
-      <Card className={cn('event-card', selected && 'is-selected')}>
-        <div className="event-card__topline">
-          <Badge
-            className="category-token"
+    <Link className="block" to={`/event/${event.id}`} data-testid="event-card">
+      <Card
+        className={cn(
+          'flex flex-col gap-[14px] rounded-2xl bg-card p-4',
+          selected &&
+            'border-[rgba(107,92,255,0.22)] shadow-[0_24px_54px_rgba(107,92,255,0.2)]'
+        )}
+      >
+        <div className="flex flex-wrap gap-[10px]">
+          <Tag
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-[0.8rem] font-bold"
             style={{
               background: category.glow,
               color: category.accent,
@@ -39,74 +52,88 @@ export function EventCard({ event, selected = false }: EventCardProps) {
           >
             <span>{category.emoji}</span>
             {category.label}
-          </Badge>
-          <Badge variant="secondary" className="event-card__count-badge">
+          </Tag>
+          <Tag
+            className="shrink-0 rounded-full px-3 py-2 text-[0.8rem] font-bold bg-[rgba(107,92,255,0.14)] text-primary dark:bg-[rgba(107,92,255,0.25)]"
+          >
             {event.attendeeIds.length} players
-          </Badge>
+          </Tag>
         </div>
 
-        <div className="event-card__headline">
-          <div className="event-card__emoji" style={{ boxShadow: `0 18px 40px ${category.glow}` }}>
+        <div className="flex items-start gap-[14px]">
+          <div
+            className="grid w-[52px] h-[52px] place-items-center rounded-[18px] bg-white text-[1.5rem]"
+            style={{ boxShadow: `0 18px 40px ${category.glow}` }}
+          >
             {category.emoji}
           </div>
           <div>
-            <h3>{event.title}</h3>
-            <p>{event.description}</p>
+            <h3 className="font-serif text-[1.28rem] leading-tight tracking-tight mb-1.5 text-ink-strong dark:text-foreground">
+              {event.title}
+            </h3>
+            <p className="text-[0.9rem] leading-relaxed text-muted-foreground">
+              {event.description}
+            </p>
           </div>
         </div>
 
-        <div className="info-grid">
-          <div className="info-pill">
+        <div className="grid gap-[10px]">
+          <Flex align="center" gap={8} className="rounded-xl bg-[color:var(--surface-strong)] p-3 text-[0.86rem] text-ink">
             <Clock3 size={14} />
-            <span>{formatEventWindow(event.startTime, event.durationMinutes)}</span>
-          </div>
-          <div className="info-pill">
+            <Typography.Text className="!text-[0.86rem] !text-ink">{formatEventWindow(event.startTime, event.durationMinutes)}</Typography.Text>
+          </Flex>
+          <Flex align="center" gap={8} className="rounded-xl bg-[color:var(--surface-strong)] p-3 text-[0.86rem] text-ink">
             <MapPin size={14} />
-            <span>
+            <Typography.Text className="!text-[0.86rem] !text-ink">
               {event.location.label} · {formatDistanceKm(distance)}
-            </span>
-          </div>
-          <div className="info-pill">
+            </Typography.Text>
+          </Flex>
+          <Flex align="center" gap={8} className="rounded-xl bg-[color:var(--surface-strong)] p-3 text-[0.86rem] text-ink">
             <Gauge size={14} />
-            <span>
-              {formatCurrency(event.price)} · {event.skillLevel.replace('_', ' ')}
-            </span>
-          </div>
-          <div className="info-pill">
+            <Typography.Text className="!text-[0.86rem] !text-ink">
+              {formatCurrency(event.price)} · {event.skillLevel.replaceAll('_', ' ')}
+            </Typography.Text>
+          </Flex>
+          <Flex align="center" gap={8} className="rounded-xl bg-[color:var(--surface-strong)] p-3 text-[0.86rem] text-ink">
             <Users size={14} />
-            <span>
-              {event.attendanceCounts.interested} interested · {event.attendanceCounts.on_my_way} on way
-            </span>
-          </div>
+            <Typography.Text className="!text-[0.86rem] !text-ink">
+              {event.attendanceCounts.interested} interested ·{' '}
+              {event.attendanceCounts.on_my_way} on way
+            </Typography.Text>
+          </Flex>
         </div>
 
-        <div className="event-card__footer">
-          <div className="event-card__participants">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 flex-1">
             <AvatarStack users={attendees} />
             <div>
-              <p>{host?.displayName ?? 'Unknown host'}</p>
-              <span>
+              <p className="font-bold text-ink-strong dark:text-foreground">
+                {host?.displayName ?? 'Unknown host'}
+              </p>
+              <span className="text-[0.8rem] text-muted-foreground">
                 {event.womenOnly ? 'Women-only' : 'Open to everyone'}
                 {event.safetyNote ? ' · Safety note ready' : ''}
               </span>
             </div>
           </div>
 
-          <div className="event-card__footer-tags">
+          <div className="flex flex-wrap gap-[10px]">
             {currentStatus ? (
-              <Badge variant="outline">{formatAttendanceStatus(currentStatus)}</Badge>
+              <Tag>
+                {formatAttendanceStatus(currentStatus)}
+              </Tag>
             ) : null}
             {event.womenOnly ? (
-              <Badge variant="outline">
+              <Tag>
                 <ShieldAlert size={12} />
                 Women-only
-              </Badge>
+              </Tag>
             ) : null}
             {event.safetyNote ? (
-              <Badge variant="outline">
+              <Tag>
                 <Flag size={12} />
                 Safety note
-              </Badge>
+              </Tag>
             ) : null}
           </div>
         </div>

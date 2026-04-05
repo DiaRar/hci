@@ -1,28 +1,28 @@
-import { Flag, Lock, SendHorizontal } from 'lucide-react';
+import { Flag, SendHorizontal, UserPlus } from 'lucide-react';
+import { Button, Card, Input, Modal, Select } from 'antd';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
-import { Badge } from '@/components/ui/badge';
-import { Button, buttonVariants } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import {
-  NativeSelect,
-  NativeSelectOption,
-} from '@/components/ui/native-select';
-import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 
 import { AppFrame, PageHeader } from '../components/AppFrame';
 import { Avatar } from '../components/Avatar';
-import { Modal } from '../components/Modal';
+import { CATEGORY_META } from '../lib/constants';
 import { REPORT_REASONS } from '../lib/constants';
 import { useBubbleStore } from '../store/BubbleStore';
 
 export function ChatPage() {
+  const navigate = useNavigate();
   const { eventId } = useParams();
-  const { currentUser, events, messages, users, joinEvent, sendMessage, submitReport } =
-    useBubbleStore();
+  const {
+    currentUser,
+    events,
+    messages,
+    users,
+    joinEvent,
+    sendMessage,
+    submitReport,
+  } = useBubbleStore();
   const event = events.find((entry) => entry.id === eventId);
   const currentUserId = currentUser?.id;
   const [draft, setDraft] = useState('');
@@ -33,7 +33,16 @@ export function ChatPage() {
 
   const eventMessages = messages.filter((message) => message.eventId === eventId);
   const blockedIds = currentUser?.trustFlags.blockedUserIds ?? [];
-  const isAttending = currentUserId ? event?.attendeeIds.includes(currentUserId) : false;
+  const isAttending = currentUserId
+    ? event?.attendeeIds.includes(currentUserId)
+    : false;
+  const hasReadableTitle = event ? /[A-Za-z0-9]/.test(event.title ?? '') : false;
+  const chatTitle = event
+    ? hasReadableTitle
+      ? event.title
+      : `${CATEGORY_META[event.category].label} session`
+    : 'Chat';
+  const attendeeLabel = event?.attendeeIds.length === 1 ? 'player' : 'players';
 
   useEffect(() => {
     scrollAnchor.current?.scrollIntoView({ behavior: 'smooth' });
@@ -42,19 +51,21 @@ export function ChatPage() {
   if (!event) {
     return (
       <AppFrame>
-        <main className="screen">
+        <main className="flex-1 flex flex-col gap-4 p-5 pb-8">
           <PageHeader
             title="Chat unavailable"
             subtitle="The session behind this chat no longer exists."
             backTo="/discover"
           />
-          <Card className="empty-state">
-            <Link
-              className={cn(buttonVariants({ size: 'sm' }), 'primary-button')}
-              to="/discover"
+          <Card className="flex flex-col items-center justify-center gap-3 p-8 text-center rounded-2xl">
+            <Button
+              size="small"
+              htmlType="button"
+              type="primary"
+              onClick={() => navigate('/discover')}
             >
               Back to discover
-            </Link>
+            </Button>
           </Card>
         </main>
       </AppFrame>
@@ -84,48 +95,34 @@ export function ChatPage() {
 
   return (
     <AppFrame>
-      <main className="screen screen--chat">
+      <main className="flex-1 flex flex-col gap-4 p-5 pb-8 min-h-0">
         <PageHeader
-          title="Session chat"
-          subtitle="Text-only team chat with demo moderation markers."
+          title={chatTitle}
+          subtitle={`${event.attendeeIds.length} ${attendeeLabel}`}
           backTo={`/event/${event.id}`}
-          action={
-            <Badge variant="outline" className="soft-badge">
-              <Lock size={12} />
-              Encrypted badge
-            </Badge>
-          }
         />
 
         {!isAttending ? (
-          <Card className="notice-card">
-            <div>
-              <h2>Join first</h2>
-              <p>
-                You can read the flow, but joining adds you to the attendee list before
-                you send messages.
+          <Card className="flex flex-col gap-3 p-4 sm:flex-row sm:items-start">
+            <UserPlus size={20} className="text-amber-600 shrink-0" />
+            <div className="flex-1">
+              <h3 className="font-semibold">Join to chat</h3>
+              <p className="mt-1 text-[0.88rem] leading-relaxed text-muted-foreground">
+                Join the session to participate in the group chat.
               </p>
             </div>
             <Button
-              className="primary-button primary-button--compact"
-              type="button"
+              htmlType="button"
+              type="primary"
               onClick={() => joinEvent(event.id)}
             >
-              Join session
+              Join
             </Button>
           </Card>
         ) : null}
 
-        <Card className="chat-stream">
-          <div className="chat-stream__header">
-            <div>
-              <p className="eyebrow">{event.title}</p>
-              <h2>{event.attendeeIds.length} people in chat</h2>
-            </div>
-            <span className="helper-copy">Photos and calls stay disabled in this version.</span>
-          </div>
-
-          <div className="message-list">
+        <div className="flex-1 min-h-0 flex flex-col gap-3">
+          <div className="scrollbar-thin flex min-h-[260px] flex-1 flex-col gap-3 overflow-auto pr-1">
             {eventMessages.length > 0 ? (
               eventMessages.map((message) => {
                 const sender = users.find((user) => user.id === message.senderId);
@@ -138,9 +135,12 @@ export function ChatPage() {
 
                 if (isBlocked && !isOwnMessage) {
                   return (
-                    <div key={message.id} className="message-row message-row--system">
-                      <div className="message-bubble message-bubble--muted">
-                        Message hidden from a blocked user.
+                    <div
+                      key={message.id}
+                      className="flex justify-center"
+                    >
+                      <div className="max-w-[78%] rounded-[20px] bg-[color:var(--surface-strong)] px-4 py-2 text-center text-sm text-muted-foreground">
+                        Message hidden
                       </div>
                     </div>
                   );
@@ -149,123 +149,121 @@ export function ChatPage() {
                 return (
                   <div
                     key={message.id}
-                    className={`message-row${isOwnMessage ? ' message-row--own' : ''}`}
+                    className={cn(
+                      'flex items-end gap-[10px]',
+                      'group',
+                      isOwnMessage && 'justify-end'
+                    )}
                   >
-                    {!isOwnMessage ? <Avatar user={sender} size="sm" /> : null}
-                    <article
-                      className={`message-bubble${isOwnMessage ? ' message-bubble--own' : ''}${
-                        message.demoModerationState === 'flagged'
-                          ? ' message-bubble--flagged'
-                          : ''
-                      }`}
-                    >
-                      <div className="message-bubble__meta">
-                        <strong>{sender.displayName}</strong>
-                        <span>
-                          {new Intl.DateTimeFormat('en', {
-                            hour: 'numeric',
-                            minute: '2-digit',
-                          }).format(new Date(message.createdAt))}
+                    {!isOwnMessage && <Avatar user={sender} size="sm" />}
+                    <div className="flex max-w-[75%] flex-col gap-1">
+                      {!isOwnMessage && (
+                        <span className="text-xs font-semibold text-muted-foreground ml-1">
+                          {sender.displayName}
                         </span>
-                      </div>
-                      <p>{message.text}</p>
-                      <div className="message-bubble__actions">
-                        {message.demoModerationState === 'flagged' ? (
-                          <Badge variant="destructive" className="soft-badge soft-badge--danger">
-                            Flagged by demo moderation
-                          </Badge>
-                        ) : null}
-                        {!isOwnMessage ? (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-button"
-                            type="button"
-                            onClick={() => setReportingMessageId(message.id)}
-                          >
-                            <Flag size={12} />
-                            Report
-                          </Button>
-                        ) : null}
-                      </div>
-                    </article>
+                      )}
+                      <article
+                        className={cn(
+                          'rounded-[20px] bg-[color:var(--surface-strong)] p-3 text-ink-strong shadow-[var(--shadow-soft)]',
+                          isOwnMessage &&
+                            'bg-[image:var(--gradient-cta)] text-primary-foreground',
+                          message.demoModerationState === 'flagged' &&
+                            'border border-[rgba(217,111,111,0.18)]'
+                        )}
+                      >
+                        <p className="text-sm">{message.text}</p>
+                      </article>
+                      <span className="ml-1 text-[10px] text-muted-foreground">
+                        {new Intl.DateTimeFormat('en', {
+                          hour: 'numeric',
+                          minute: '2-digit',
+                        }).format(new Date(message.createdAt))}
+                        {message.demoModerationState === 'flagged' && ' · Flagged'}
+                      </span>
+                    </div>
+                    {!isOwnMessage && (
+                      <Button
+                        type="text"
+                        shape="circle"
+                        size="small"
+                        htmlType="button"
+                        onClick={() => setReportingMessageId(message.id)}
+                        aria-label="Report message"
+                      >
+                        <Flag size={12} />
+                      </Button>
+                    )}
                   </div>
                 );
               })
             ) : (
-              <div className="message-row message-row--system">
-                <div className="message-bubble message-bubble--muted">
-                  No messages yet. Say hi first.
-                </div>
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <p className="text-[0.88rem] leading-relaxed text-muted-foreground">
+                  No messages yet. Say hi!
+                </p>
               </div>
             )}
             <div ref={scrollAnchor} />
           </div>
-        </Card>
 
-        <form onSubmit={handleSubmit}>
-          <Card className="composer">
-            <Input
-              className="composer__input"
-              type="text"
-              placeholder="Type a message for the group..."
-              value={draft}
-              onChange={(event) => setDraft(event.target.value)}
-            />
-            <Button className="primary-button composer__button" type="submit">
-              <SendHorizontal size={16} />
-            </Button>
-          </Card>
-        </form>
+          {isAttending && (
+            <form onSubmit={handleSubmit} className="shrink-0">
+              <div className="rounded-[20px] border border-[rgba(44,44,44,0.22)] bg-[color:var(--surface-strong)] p-3">
+                <div className="flex items-center gap-2">
+                <Input
+                  className="flex-1"
+                  type="text"
+                  placeholder="Message the group..."
+                  value={draft}
+                  onChange={(event) => setDraft(event.target.value)}
+                />
+                <Button
+                  htmlType="submit"
+                  type="primary"
+                  shape="circle"
+                  className="!h-11 !w-11 !min-w-11 !p-0 !shadow-[4px_4px_0_#2C2C2C]"
+                  icon={<SendHorizontal size={16} />}
+                  aria-label="Send message"
+                />
+                </div>
+              </div>
+            </form>
+          )}
+        </div>
 
         <Modal
           open={Boolean(reportingMessageId)}
+          onCancel={() => setReportingMessageId(null)}
+          onOk={handleReport}
           title="Report message"
-          description="This mock records the report locally so the trust/safety flow is tangible."
-          onClose={() => setReportingMessageId(null)}
-          footer={
-            <>
-              <Button
-                variant="outline"
-                className="secondary-button"
-                type="button"
-                onClick={() => setReportingMessageId(null)}
-              >
-                Cancel
-              </Button>
-              <Button
-                className="primary-button primary-button--compact"
-                type="button"
-                onClick={handleReport}
-              >
-                Submit report
-              </Button>
-            </>
-          }
+          okText="Submit"
+          cancelText="Cancel"
         >
-          <label className="field">
-            <span className="field__label">Reason</span>
-            <NativeSelect
-              value={reportReason}
-              onChange={(event) => setReportReason(event.target.value)}
-            >
-              {REPORT_REASONS.map((reason) => (
-                <NativeSelectOption key={reason} value={reason}>
-                  {reason}
-                </NativeSelectOption>
-              ))}
-            </NativeSelect>
-          </label>
-          <label className="field">
-            <span className="field__label">Notes</span>
-            <Textarea
-              className="text-field--textarea"
-              rows={4}
-              value={reportNotes}
-              onChange={(event) => setReportNotes(event.target.value)}
-              placeholder="Explain what happened."
-            />
-          </label>
+          <p className="mb-4 text-sm text-muted-foreground">
+            Reports are stored locally to demonstrate the flow.
+          </p>
+          <div className="flex flex-col gap-4">
+            <label className="field">
+              <span className="mb-1.5 block text-sm font-medium">Reason</span>
+              <Select
+                value={reportReason}
+                onChange={(value) => setReportReason(value)}
+                options={REPORT_REASONS.map((reason) => ({
+                  value: reason,
+                  label: reason,
+                }))}
+              />
+            </label>
+            <label className="field">
+              <span className="mb-1.5 block text-sm font-medium">Notes</span>
+              <Input.TextArea
+                rows={3}
+                value={reportNotes}
+                onChange={(event) => setReportNotes(event.target.value)}
+                placeholder="Explain what happened."
+              />
+            </label>
+          </div>
         </Modal>
       </main>
     </AppFrame>

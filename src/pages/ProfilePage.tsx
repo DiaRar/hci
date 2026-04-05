@@ -1,26 +1,14 @@
-import { Download, ShieldAlert, Trash2, UserPlus } from 'lucide-react';
+import { Download, LogOut, ShieldAlert, ShieldCheck, Trash2, UserPlus } from 'lucide-react';
+import { Button, Card, Checkbox, Input, Modal, Select, Switch, Tag, Typography } from 'antd';
 import { useState, type FormEvent } from 'react';
-import { Link, useParams } from 'react-router-dom';
-
-import { Badge } from '@/components/ui/badge';
-import { Button, buttonVariants } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import {
-  NativeSelect,
-  NativeSelectOption,
-} from '@/components/ui/native-select';
-import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
-import { cn } from '@/lib/utils';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { AppFrame, PageHeader } from '../components/AppFrame';
 import { Avatar } from '../components/Avatar';
-import { EventCard } from '../components/EventCard';
-import { Modal } from '../components/Modal';
-import { INTEREST_OPTIONS, REPORT_REASONS } from '../lib/constants';
+import { CATEGORY_META, REPORT_REASONS } from '../lib/constants';
+import { formatCurrency, formatEventWindow } from '../lib/format';
 import { useBubbleStore } from '../store/BubbleStore';
-import type { ProfilePatch, ReportTargetType, User } from '../types';
+import type { Event, ProfilePatch, ReportTargetType, User } from '../types';
 
 type ReportTarget = {
   type: ReportTargetType;
@@ -28,7 +16,12 @@ type ReportTarget = {
   label: string;
 };
 
+function isReadableTitle(title: string): boolean {
+  return /[A-Za-z0-9]/.test(title);
+}
+
 export function ProfilePage() {
+  const navigate = useNavigate();
   const { userId } = useParams();
   const {
     currentUser,
@@ -40,6 +33,7 @@ export function ProfilePage() {
     blockUser,
     exportCurrentUserData,
     deleteCurrentUser,
+    signOut,
   } = useBubbleStore();
   const profile = users.find((user) => user.id === (userId ?? currentUser?.id));
   const isOwnProfile = !userId || userId === currentUser?.id;
@@ -51,19 +45,21 @@ export function ProfilePage() {
   if (!profile) {
     return (
       <AppFrame>
-        <main className="screen">
+        <main className="flex-1 flex flex-col gap-4 p-5 pb-8">
           <PageHeader
             title="Profile missing"
             subtitle="This user may have deleted their demo account."
             backTo="/discover"
           />
-          <Card className="empty-state">
-            <Link
-              className={cn(buttonVariants({ size: 'sm' }), 'primary-button')}
-              to="/discover"
+          <Card className="flex flex-col items-center justify-center gap-3 p-8 text-center rounded-2xl">
+            <Button
+              size="small"
+              htmlType="button"
+              type="primary"
+              onClick={() => navigate('/discover')}
             >
               Back to discover
-            </Link>
+            </Button>
           </Card>
         </main>
       </AppFrame>
@@ -72,7 +68,16 @@ export function ProfilePage() {
 
   const hostedEvents = events.filter((event) => event.hostId === profile.id);
   const joinedEvents = events.filter(
-    (event) => event.attendeeIds.includes(profile.id) && event.hostId !== profile.id,
+    (event) =>
+      event.attendeeIds.includes(profile.id) && event.hostId !== profile.id,
+  );
+  const sortedHostedEvents = [...hostedEvents].sort(
+    (left, right) =>
+      new Date(left.startTime).getTime() - new Date(right.startTime).getTime(),
+  );
+  const sortedJoinedEvents = [...joinedEvents].sort(
+    (left, right) =>
+      new Date(left.startTime).getTime() - new Date(right.startTime).getTime(),
   );
   const isFriend = currentUser ? currentUser.friends.includes(profile.id) : false;
 
@@ -109,84 +114,109 @@ export function ProfilePage() {
 
   return (
     <AppFrame>
-      <main className="screen">
+      <main className="scrollbar-thin flex flex-1 min-h-0 flex-col gap-4 overflow-y-auto p-5 pb-8">
         <PageHeader
-          title={isOwnProfile ? 'Your profile' : profile.displayName}
+          title={isOwnProfile ? 'Your profile' : 'Profile'}
           subtitle={
             isOwnProfile
               ? 'Edit how you appear in the app and manage your mock GDPR actions.'
-              : 'See who this person is before you join their session.'
+              : `See who ${profile.displayName} is before you join their session.`
           }
           backTo="/discover"
         />
 
-        <Card className="hero-card hero-card--profile">
-          <Avatar user={profile} size="lg" />
-          <h1>{profile.displayName}</h1>
-          <p>{profile.bio}</p>
-          <div className="hero-card__metrics">
-            <Badge variant="outline" className="soft-badge">
+        <Card className="rounded-2xl" styles={{ body: { padding: 16 } }}>
+          <div className="flex items-start gap-3">
+            <Avatar user={profile} size="lg" />
+            <div className="min-w-0 flex-1">
+              <h1 className="truncate font-serif text-[2rem] leading-tight tracking-tight text-ink-strong dark:text-foreground">
+                {profile.displayName}
+              </h1>
+              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                {profile.bio}
+              </p>
+            </div>
+          </div>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {profile.trustFlags.verifiedHost ? (
+              <Tag className="m-0 inline-flex items-center gap-1.5 rounded-full bg-[rgba(107,92,255,0.12)] px-3 py-1.5 text-[0.78rem] font-semibold text-primary">
+                <ShieldCheck size={13} />
+                Verified host
+              </Tag>
+            ) : null}
+            <Tag className="m-0 rounded-full bg-white/70 px-3 py-1.5 text-[0.78rem] font-semibold text-ink-strong dark:bg-white/20">
               {profile.interests.length} interests
-            </Badge>
-            <Badge variant="outline" className="soft-badge">
+            </Tag>
+            <Tag className="m-0 rounded-full bg-white/70 px-3 py-1.5 text-[0.78rem] font-semibold text-ink-strong dark:bg-white/20">
               {profile.friends.length} friends
-            </Badge>
-            <Badge variant="outline" className="soft-badge">
+            </Tag>
+            <Tag className="m-0 rounded-full bg-white/70 px-3 py-1.5 text-[0.78rem] font-semibold text-ink-strong dark:bg-white/20">
               {profile.trustFlags.noShowStrikes} no-show strikes
-            </Badge>
+            </Tag>
           </div>
         </Card>
 
         {isOwnProfile ? (
-          <div className="stack">
+          <div className="flex flex-col gap-4">
             <OwnProfileEditor
               key={profile.id}
               profile={profile}
               onSave={updateProfile}
             />
 
-            <Card>
-              <div className="section-title">
+            <Card className="rounded-2xl" styles={{ body: { padding: 16 } }}>
+              <div className="mb-3.5 inline-flex items-center gap-2 font-extrabold text-red-600 dark:text-red-400">
                 <ShieldAlert size={16} />
-                <span>Data rights</span>
+                <span>Danger zone</span>
               </div>
-              <div className="button-row">
+              <p className="mb-4 text-sm text-muted-foreground">
+                Account actions are local-only in this prototype, but this flow mimics production controls.
+              </p>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 <Button
-                  variant="outline"
-                  className="secondary-button"
-                  type="button"
+                  type="default"
+                  htmlType="button"
+                  className="!justify-start"
                   onClick={handleExport}
                 >
                   <Download size={14} />
                   Export my data
                 </Button>
                 <Button
-                  variant="outline"
-                  className="secondary-button"
-                  type="button"
+                  danger
+                  htmlType="button"
+                  className="!justify-start"
                   onClick={() => setDeleteOpen(true)}
                 >
                   <Trash2 size={14} />
                   Delete account
                 </Button>
+                <Button
+                  type="default"
+                  htmlType="button"
+                  className="!justify-start sm:col-span-2"
+                  onClick={signOut}
+                >
+                  <LogOut size={14} />
+                  Sign out
+                </Button>
               </div>
             </Card>
           </div>
         ) : (
-          <Card>
-            <div className="button-row">
+          <Card className="rounded-2xl" styles={{ body: { padding: 16 } }}>
+            <div className="mb-4 flex flex-wrap gap-[10px]">
               <Button
-                className="primary-button primary-button--compact"
-                type="button"
+                htmlType="button"
+                type="primary"
                 onClick={() => toggleFriend(profile.id)}
               >
                 <UserPlus size={14} />
                 {isFriend ? 'Remove friend' : 'Add friend'}
               </Button>
               <Button
-                variant="outline"
-                className="secondary-button"
-                type="button"
+                type="default"
+                htmlType="button"
                 onClick={() =>
                   setReportTarget({
                     type: 'user',
@@ -198,56 +228,77 @@ export function ProfilePage() {
                 Report user
               </Button>
               <Button
-                variant="outline"
-                className="secondary-button"
-                type="button"
+                type="default"
+                htmlType="button"
                 onClick={() => blockUser(profile.id)}
               >
                 Block user
               </Button>
             </div>
-            <div className="chip-grid">
+            <div className="flex flex-wrap gap-[10px]">
               {profile.languages.map((language) => (
-                <Badge key={language} variant="outline" className="soft-badge">
+                <Tag
+                  key={language}
+                  className="m-0 inline-flex items-center gap-1.5 rounded-full bg-white/70 px-3 py-1.5 text-[0.8rem] font-semibold text-ink-strong dark:bg-white/20"
+                >
                   {language}
-                </Badge>
+                </Tag>
               ))}
               {profile.interests.map((interest) => (
-                <Badge key={interest} variant="secondary" className="soft-badge soft-badge--warm">
+                <Tag
+                  key={interest}
+                  className="m-0 inline-flex items-center gap-1.5 rounded-full bg-[rgba(255,205,137,0.22)] px-3 py-1.5 text-[0.8rem] font-semibold text-[#8d5f48] dark:bg-[rgba(255,224,181,0.58)] dark:text-[var(--accent-foreground)]"
+                >
                   {interest}
-                </Badge>
+                </Tag>
               ))}
             </div>
           </Card>
         )}
 
         {hostedEvents.length > 0 ? (
-          <section className="list-section">
-            <div className="list-section__header">
+          <section className="flex flex-col gap-[14px]">
+            <div className="flex items-end justify-between gap-3">
               <div>
-                <p className="eyebrow">Hosted</p>
-                <h2>{profile.displayName.split(' ')[0]}'s sessions</h2>
+                <p className="mb-1 block text-[0.75rem] font-bold uppercase tracking-[0.14em] text-muted-foreground">
+                  Hosted
+                </p>
+                <h2 className="font-serif text-2xl tracking-tight text-ink-strong dark:text-foreground">
+                  {profile.displayName.split(' ')[0]}'s sessions
+                </h2>
               </div>
             </div>
-            <div className="event-list">
-              {hostedEvents.slice(0, 2).map((event) => (
-                <EventCard key={event.id} event={event} />
+            <div className="flex flex-col gap-[14px]">
+              {sortedHostedEvents.slice(0, 3).map((event) => (
+                <ProfileSessionCard
+                  key={event.id}
+                  event={event}
+                  onOpen={() => navigate(`/event/${event.id}`)}
+                />
               ))}
             </div>
           </section>
         ) : null}
 
         {joinedEvents.length > 0 ? (
-          <section className="list-section">
-            <div className="list-section__header">
+          <section className="flex flex-col gap-[14px]">
+            <div className="flex items-end justify-between gap-3">
               <div>
-                <p className="eyebrow">Joined</p>
-                <h2>Upcoming sessions</h2>
+                <p className="mb-1 block text-[0.75rem] font-bold uppercase tracking-[0.14em] text-muted-foreground">
+                  Joined
+                </p>
+                <h2 className="font-serif text-2xl tracking-tight text-ink-strong dark:text-foreground">
+                  Upcoming sessions
+                </h2>
               </div>
             </div>
-            <div className="event-list">
-              {joinedEvents.slice(0, 2).map((event) => (
-                <EventCard key={event.id} event={event} />
+            <div className="flex flex-col gap-[14px]">
+              {sortedJoinedEvents.slice(0, 3).map((event) => (
+                <ProfileSessionCard
+                  key={event.id}
+                  event={event}
+                  onOpen={() => navigate(`/event/${event.id}`)}
+                />
               ))}
             </div>
           </section>
@@ -255,81 +306,53 @@ export function ProfilePage() {
 
         <Modal
           open={deleteOpen}
+          onCancel={() => setDeleteOpen(false)}
+          onOk={handleDelete}
+          okButtonProps={{ danger: true }}
+          okText="Delete"
+          cancelText="Cancel"
           title="Delete account"
-          description="This removes your local profile, hosted events, attendance, and messages from the mock store."
-          onClose={() => setDeleteOpen(false)}
-          footer={
-            <>
-              <Button
-                variant="outline"
-                className="secondary-button"
-                type="button"
-                onClick={() => setDeleteOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                className="primary-button primary-button--compact"
-                type="button"
-                onClick={handleDelete}
-              >
-                Delete
-              </Button>
-            </>
-          }
         >
-          <p className="helper-copy">
+          <p className="text-[0.88rem] leading-relaxed text-muted-foreground">
+            This removes your local profile, hosted events, attendance, and messages from the mock store.
+          </p>
+          <p className="mt-3 text-[0.88rem] leading-relaxed text-muted-foreground">
             This is the demo version of the right to be forgotten flow.
           </p>
         </Modal>
 
         <Modal
           open={Boolean(reportTarget)}
+          onCancel={() => setReportTarget(null)}
+          onOk={handleReport}
           title={reportTarget ? `Report ${reportTarget.label}` : 'Report user'}
-          description="Reports are stored locally to demonstrate the flow."
-          onClose={() => setReportTarget(null)}
-          footer={
-            <>
-              <Button
-                variant="outline"
-                className="secondary-button"
-                type="button"
-                onClick={() => setReportTarget(null)}
-              >
-                Cancel
-              </Button>
-              <Button
-                className="primary-button primary-button--compact"
-                type="button"
-                onClick={handleReport}
-              >
-                Submit report
-              </Button>
-            </>
-          }
+          okText="Submit report"
+          cancelText="Cancel"
         >
-          <label className="field">
-            <span className="field__label">Reason</span>
-            <NativeSelect
-              value={reportReason}
-              onChange={(event) => setReportReason(event.target.value)}
-            >
-              {REPORT_REASONS.map((reason) => (
-                <NativeSelectOption key={reason} value={reason}>
-                  {reason}
-                </NativeSelectOption>
-              ))}
-            </NativeSelect>
-          </label>
-          <label className="field">
-            <span className="field__label">Notes</span>
-            <Textarea
-              className="text-field--textarea"
-              rows={4}
-              value={reportNotes}
-              onChange={(event) => setReportNotes(event.target.value)}
-            />
-          </label>
+          <p className="mb-4 text-sm text-muted-foreground">
+            Reports are stored locally to demonstrate the flow.
+          </p>
+          <div className="flex flex-col gap-4">
+            <label className="flex flex-col gap-2">
+              <span className="block text-sm font-medium">Reason</span>
+              <Select
+                value={reportReason}
+                onChange={(value) => setReportReason(value)}
+                options={REPORT_REASONS.map((reason) => ({
+                  value: reason,
+                  label: reason,
+                }))}
+              />
+            </label>
+            <label className="flex flex-col gap-2">
+              <span className="block text-sm font-medium">Notes</span>
+              <Input.TextArea
+                rows={4}
+                value={reportNotes}
+                onChange={(event) => setReportNotes(event.target.value)}
+              />
+            </label>
+          </div>
         </Modal>
       </main>
     </AppFrame>
@@ -352,14 +375,6 @@ function OwnProfileEditor({
   );
   const [savedMessage, setSavedMessage] = useState('');
 
-  const toggleInterest = (interest: string) => {
-    setInterests((current) =>
-      current.includes(interest)
-        ? current.filter((entry) => entry !== interest)
-        : [...current, interest],
-    );
-  };
-
   const handleSave = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     onSave({
@@ -376,27 +391,29 @@ function OwnProfileEditor({
   };
 
   return (
-    <form className="stack" onSubmit={handleSave}>
-      <Card className="form-card">
-        <label className="field">
-          <span className="field__label">Display name</span>
+    <form className="flex flex-col gap-4" onSubmit={handleSave}>
+      <Card className="rounded-2xl" styles={{ body: { padding: 16 } }}>
+        <div className="flex flex-col gap-4">
+        <label className="flex flex-col gap-2">
+          <span className="block text-sm font-bold text-ink-strong dark:text-foreground">
+            Display name
+          </span>
           <Input
             type="text"
             value={displayName}
             onChange={(event) => setDisplayName(event.target.value)}
           />
         </label>
-        <label className="field">
-          <span className="field__label">Bio</span>
-          <Textarea
-            className="text-field--textarea"
+        <label className="flex flex-col gap-2">
+          <span className="block text-sm font-bold text-ink-strong dark:text-foreground">Bio</span>
+          <Input.TextArea
             rows={4}
             value={bio}
             onChange={(event) => setBio(event.target.value)}
           />
         </label>
-        <label className="field">
-          <span className="field__label">Languages</span>
+        <label className="flex flex-col gap-2">
+          <span className="block text-sm font-bold text-ink-strong dark:text-foreground">Languages</span>
           <Input
             type="text"
             value={languages}
@@ -404,41 +421,116 @@ function OwnProfileEditor({
             placeholder="English, Dutch"
           />
         </label>
-        <div className="field">
-          <div className="field__label-row">
-            <span className="field__label">Interests</span>
-            <span className="field__hint">These show up in the profile and auth flow.</span>
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between gap-2">
+            <span className="block text-sm font-bold text-ink-strong dark:text-foreground">
+              Interests
+            </span>
+            <span className="text-[0.78rem] font-medium text-muted-foreground">
+              These show up in the profile and auth flow.
+            </span>
           </div>
-          <div className="chip-grid">
-            {INTEREST_OPTIONS.map((interest) => (
-              <Button
-                key={interest}
-                type="button"
-                variant={interests.includes(interest) ? 'default' : 'outline'}
-                size="sm"
-                className="pill-button"
-                onClick={() => toggleInterest(interest)}
+          {([
+            ['Sports', ['Tennis', 'Padel', 'Football', 'Basketball', 'Running', 'Volleyball', 'Badminton']],
+            ['Fitness', ['Cycling', 'Training', 'Gym', 'Mobility', 'Recovery']],
+          ] as [string, string[]][]).map(([group, items]) => (
+            <div key={group} className="mb-3">
+              <p className="mb-2 text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                {group}
+              </p>
+              <Checkbox.Group
+                value={interests}
+                onChange={(values) => setInterests(values as string[])}
+                className="grid grid-cols-2 gap-x-3 gap-y-2"
               >
-                {interest}
-              </Button>
-            ))}
-          </div>
+                {items.map((interest) => (
+                  <Checkbox key={interest} value={interest} className="!mr-0">
+                    <span className="text-sm font-medium">{interest}</span>
+                  </Checkbox>
+                ))}
+              </Checkbox.Group>
+            </div>
+          ))}
         </div>
-        <label className="switch-card">
+        <label className="grid grid-cols-[1fr_auto] items-center gap-3 p-4 rounded-[20px] border border-[rgba(112,95,163,0.14)] bg-white/68 dark:bg-white/10">
           <div>
-            <span className="field__label">Nearby discovery</span>
-            <p className="field__hint">Open-map visibility is opt-in on the profile.</p>
+            <span className="block text-sm font-bold text-ink-strong dark:text-foreground">
+              Nearby discovery
+            </span>
+            <p className="mt-0.5 text-[0.78rem] font-medium text-muted-foreground">
+              Open-map visibility is opt-in on the profile.
+            </p>
           </div>
           <Switch
             checked={nearbyDiscoveryEnabled}
-            onCheckedChange={setNearbyDiscoveryEnabled}
+            onChange={setNearbyDiscoveryEnabled}
           />
         </label>
-        {savedMessage ? <p className="helper-copy helper-copy--success">{savedMessage}</p> : null}
-        <Button className="primary-button" type="submit">
+        {savedMessage ? (
+          <p className="text-[0.88rem] leading-relaxed text-success">{savedMessage}</p>
+        ) : null}
+        <Button htmlType="submit" type="primary" className="!w-full !shadow-[4px_4px_0_#2C2C2C]">
           Save profile
         </Button>
+        </div>
       </Card>
     </form>
+  );
+}
+
+function ProfileSessionCard({
+  event,
+  onOpen,
+}: {
+  event: Event;
+  onOpen: () => void;
+}) {
+  const category = CATEGORY_META[event.category];
+  const title = isReadableTitle(event.title)
+    ? event.title
+    : `${category.label} session`;
+
+  return (
+    <Card
+      hoverable
+      className="cursor-pointer rounded-2xl"
+      styles={{ body: { padding: 14 } }}
+      onClick={onOpen}
+    >
+      <div className="mb-2.5 flex flex-wrap items-center gap-2">
+        <Tag className="m-0 rounded-full bg-[rgba(107,92,255,0.12)] px-2.5 py-1 text-[0.78rem] font-semibold text-primary">
+          {category.emoji} {category.label}
+        </Tag>
+        <Tag className="m-0 rounded-full bg-white/70 px-2.5 py-1 text-[0.78rem] font-semibold text-ink-strong dark:bg-white/20">
+          {event.attendeeIds.length} {event.attendeeIds.length === 1 ? 'player' : 'players'}
+        </Tag>
+      </div>
+
+      <Typography.Title
+        level={4}
+        className="!mb-1 !text-[1.1rem] !leading-snug !tracking-tight !text-ink-strong dark:!text-foreground"
+        ellipsis={{ rows: 1 }}
+      >
+        {title}
+      </Typography.Title>
+      <Typography.Paragraph
+        className="!mb-2.5 !text-sm !text-muted-foreground"
+        ellipsis={{ rows: 2 }}
+      >
+        {event.description}
+      </Typography.Paragraph>
+
+      <div className="grid gap-1.5">
+        <Typography.Text className="!text-[0.86rem] !text-muted-foreground">
+          {formatEventWindow(event.startTime, event.durationMinutes)}
+        </Typography.Text>
+        <Typography.Text className="!text-[0.86rem] !text-muted-foreground">
+          {event.location.label}
+        </Typography.Text>
+        <Typography.Text className="!text-[0.86rem] !text-muted-foreground">
+          {formatCurrency(event.price)} · {event.skillLevel.replaceAll('_', ' ')}
+        </Typography.Text>
+      </div>
+    </Card>
   );
 }

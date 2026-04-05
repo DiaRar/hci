@@ -3,28 +3,17 @@ import {
   Flag,
   Lock,
   MapPin,
+  MessageCircle,
   ShieldAlert,
   TriangleAlert,
   Users,
 } from 'lucide-react';
+import { Button, Card, Input, Modal, Select, Switch, Tabs, Tag, Typography } from 'antd';
 import { useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
-
-import { Badge } from '@/components/ui/badge';
-import { Button, buttonVariants } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import {
-  NativeSelect,
-  NativeSelectOption,
-} from '@/components/ui/native-select';
-import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
-import { cn } from '@/lib/utils';
-
+import { useNavigate, useParams } from 'react-router-dom';
 import { AppFrame, PageHeader } from '../components/AppFrame';
 import { Avatar } from '../components/Avatar';
 import { EventMap } from '../components/EventMap';
-import { Modal } from '../components/Modal';
 import {
   ATTENDANCE_LABELS,
   CATEGORY_META,
@@ -39,6 +28,10 @@ type ReportTarget = {
   id: string;
   label: string;
 };
+
+function isReadableText(value: string): boolean {
+  return /[A-Za-z0-9]/.test(value);
+}
 
 export function EventPage() {
   const navigate = useNavigate();
@@ -62,21 +55,23 @@ export function EventPage() {
   if (!event) {
     return (
       <AppFrame>
-        <main className="screen">
+        <main className="flex-1 flex flex-col gap-4 p-5 pb-8">
           <PageHeader
             title="Session missing"
             subtitle="This session may have been removed from the mock store."
             backTo="/discover"
           />
-          <Card className="empty-state">
+          <Card className="flex flex-col items-center justify-center gap-3 p-8 text-center rounded-2xl">
             <h2>That session is gone.</h2>
             <p>If the host deleted their profile, hosted sessions disappear too.</p>
-            <Link
-              className={cn(buttonVariants({ size: 'sm' }), 'primary-button')}
-              to="/discover"
+            <Button
+              size="small"
+              htmlType="button"
+              type="primary"
+              onClick={() => navigate('/discover')}
             >
               Back to discover
-            </Link>
+            </Button>
           </Card>
         </main>
       </AppFrame>
@@ -87,7 +82,9 @@ export function EventPage() {
   const participants = event.attendeeIds
     .map((userId) => users.find((user) => user.id === userId))
     .filter((user): user is NonNullable<typeof user> => Boolean(user));
-  const currentStatus = currentUser ? event.attendanceStatuses[currentUser.id] : undefined;
+  const currentStatus = currentUser
+    ? event.attendanceStatuses[currentUser.id]
+    : undefined;
   const isAttending = Boolean(currentStatus);
   const reminderEnabled = currentUser
     ? event.reminderUserIds.includes(currentUser.id)
@@ -96,6 +93,15 @@ export function EventPage() {
     ? currentUser.trustFlags.blockedUserIds.includes(event.hostId)
     : false;
   const category = CATEGORY_META[event.category];
+  const safeTitle = isReadableText(event.title ?? '')
+    ? event.title
+    : `${category.label} session`;
+  const safeDescription = isReadableText(event.description ?? '')
+    ? event.description
+    : 'Session details will be shared by the host.';
+  const safeSafetyNote = isReadableText(event.safetyNote ?? '')
+    ? event.safetyNote
+    : 'Exact court, field, or meetup point stays visible on the map in this demo.';
 
   const handleAttendance = (status: AttendanceStatus) => {
     setAttendance(event.id, status);
@@ -125,54 +131,66 @@ export function EventPage() {
 
   return (
     <AppFrame>
-      <main className="screen">
+      <main className="flex-1 flex flex-col gap-4 p-5 pb-8">
         <PageHeader
           title="Session details"
           subtitle="Players, timing, cost, and safety entry points stay visible before you join chat."
           backTo="/discover"
         />
 
-        <Card className="hero-card hero-card--event">
-          <div className="hero-card__halo" style={{ background: category.glow }} />
-          <div
-            className="hero-card__bubble-icon"
-            style={{ boxShadow: `0 24px 60px ${category.glow}` }}
-          >
-            {category.emoji}
+        <Card
+          className="relative overflow-hidden rounded-[24px] border border-[var(--surface-border)] bg-[var(--surface)] shadow-[var(--surface-shadow)] backdrop-blur-[18px]"
+          styles={{ body: { padding: 16 } }}
+        >
+          <div className="relative flex flex-col items-center text-center">
+            <div
+              className="absolute -top-[86px] h-[220px] w-[220px] rounded-full opacity-[0.55]"
+              style={{ background: category.glow }}
+            />
+            <div
+              className="relative z-10 mb-3 grid h-[84px] w-[84px] place-items-center rounded-full"
+              style={{ boxShadow: `0 18px 44px ${category.glow}` }}
+            >
+              {category.emoji}
+            </div>
+            <Tag
+              className="m-0 mb-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[0.8rem] font-bold"
+              style={{ background: category.glow, color: category.accent }}
+            >
+              <span>{category.emoji}</span>
+              {category.label}
+            </Tag>
+            <h1 className="font-serif text-[2rem] leading-tight tracking-tight text-ink-strong dark:text-foreground">
+              {safeTitle}
+            </h1>
+            <p className="mt-2 text-[0.92rem] leading-relaxed text-muted-foreground">
+              {safeDescription}
+            </p>
           </div>
-          <Badge
-            className="category-token"
-            style={{ background: category.glow, color: category.accent }}
-          >
-            <span>{category.emoji}</span>
-            {category.label}
-          </Badge>
-          <h1>{event.title}</h1>
-          <p>{event.description}</p>
-          <div className="hero-card__metrics">
-            <Badge variant="outline" className="soft-badge">
+          <div className="mt-4 flex flex-wrap gap-[10px]">
+            <Tag className="m-0 inline-flex items-center gap-1.5 rounded-full bg-white/70 px-3 py-1.5 text-[0.8rem] font-semibold text-ink-strong dark:bg-white/20">
               <Users size={12} />
               {event.attendeeIds.length} players
-            </Badge>
-            <Badge variant="outline" className="soft-badge">
+            </Tag>
+            <Tag className="m-0 inline-flex items-center gap-1.5 rounded-full bg-white/70 px-3 py-1.5 text-[0.8rem] font-semibold text-ink-strong dark:bg-white/20">
               <BellRing size={12} />
               {formatEventWindow(event.startTime, event.durationMinutes)}
-            </Badge>
+            </Tag>
             {event.womenOnly ? (
-              <Badge variant="outline" className="soft-badge">
+              <Tag className="m-0 inline-flex items-center gap-1.5 rounded-full bg-white/70 px-3 py-1.5 text-[0.8rem] font-semibold text-ink-strong dark:bg-white/20">
                 <ShieldAlert size={12} />
                 Women-only
-              </Badge>
+              </Tag>
             ) : null}
           </div>
         </Card>
 
         {hostBlocked ? (
-          <Card className="notice-card notice-card--warning">
-            <TriangleAlert size={16} />
+          <Card className="flex gap-3 p-4">
+            <TriangleAlert size={16} className="shrink-0 mt-0.5 text-amber-600" />
             <div>
-              <h3>Host blocked</h3>
-              <p>
+              <h3 className="font-semibold">Host blocked</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
                 You blocked this host from your profile. The session remains visible here
                 because you opened it directly.
               </p>
@@ -180,162 +198,220 @@ export function EventPage() {
           </Card>
         ) : null}
 
-        <Card>
-          <div className="section-title">
-            <Users size={16} />
-            <span>Who is coming</span>
-          </div>
-          <div className="people-grid">
-            {participants.map((participant) => (
-              <Link
-                key={participant.id}
-                className="person-card"
-                to={`/profile/${participant.id}`}
-              >
-                <Avatar user={participant} size="lg" />
-                <div className="person-card__copy">
-                  <strong>{participant.displayName}</strong>
-                  <span>
-                    {participant.id === host?.id
-                      ? 'Host'
-                      : ATTENDANCE_LABELS[event.attendanceStatuses[participant.id]]}
-                  </span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </Card>
-
-        <Card className="stat-grid">
-          <div className="stat-card">
-            <span className="eyebrow">Price</span>
-            <strong>{formatCurrency(event.price)}</strong>
-          </div>
-          <div className="stat-card">
-            <span className="eyebrow">Skill</span>
-            <strong>{event.skillLevel.replace('_', ' ')}</strong>
-          </div>
-          <div className="stat-card">
-            <span className="eyebrow">Duration</span>
-            <strong>{event.durationMinutes} min</strong>
-          </div>
-          <div className="stat-card">
-            <span className="eyebrow">Attendance</span>
-            <strong>{event.attendanceCounts.here} here now</strong>
-          </div>
-        </Card>
-
-        <Card>
-          <div className="section-title">
-            <MapPin size={16} />
-            <span>Location</span>
-          </div>
-          <p className="helper-copy">{event.safetyNote}</p>
-          <EventMap
-            compact
-            events={[event]}
-            selectedEventId={event.id}
-            userLocation={userLocation}
-            onSelectEvent={() => undefined}
-          />
-          <div className="inline-actions">
-            <Badge variant="outline" className="soft-badge">
-              {event.location.label}
-            </Badge>
-            <Link
-              className={cn(
-                buttonVariants({ variant: 'outline', size: 'sm' }),
-                'secondary-button',
-              )}
-              to={`/discover?focus=${event.id}`}
-            >
-              View on map
-            </Link>
-          </div>
-        </Card>
-
-        <Card>
-          <div className="section-title">
-            <Lock size={16} />
-            <span>Attendance & chat</span>
-          </div>
-          <div className="status-selector">
-            {(Object.entries(ATTENDANCE_LABELS) as Array<[AttendanceStatus, string]>).map(
-              ([status, label]) => (
-                <Button
-                  key={status}
-                  type="button"
-                  variant={currentStatus === status ? 'default' : 'outline'}
-                  size="sm"
-                  className="status-button"
-                  onClick={() => handleAttendance(status)}
-                >
-                  {label}
-                </Button>
+        <Tabs
+          defaultActiveKey="details"
+          items={[
+            {
+              key: 'details',
+              label: <span data-testid="tab-details">Details</span>,
+              children: (
+                <>
+                  <Card className="rounded-2xl" styles={{ body: { padding: 14 } }}>
+                    <div className="grid grid-cols-2 gap-3">
+                    <div className="rounded-[16px] bg-white/72 p-3.5">
+                      <span className="mb-1 block text-[0.72rem] font-bold uppercase tracking-[0.14em] text-muted-foreground">Price</span>
+                      <strong className="text-ink-strong dark:text-foreground">{formatCurrency(event.price)}</strong>
+                    </div>
+                    <div className="rounded-[16px] bg-white/72 p-3.5">
+                      <span className="mb-1 block text-[0.72rem] font-bold uppercase tracking-[0.14em] text-muted-foreground">Skill</span>
+                      <strong className="text-ink-strong dark:text-foreground">{event.skillLevel.replaceAll('_', ' ')}</strong>
+                    </div>
+                    <div className="rounded-[16px] bg-white/72 p-3.5">
+                      <span className="mb-1 block text-[0.72rem] font-bold uppercase tracking-[0.14em] text-muted-foreground">Duration</span>
+                      <strong className="text-ink-strong dark:text-foreground">{event.durationMinutes} min</strong>
+                    </div>
+                    <div className="rounded-[16px] bg-white/72 p-3.5">
+                      <span className="mb-1 block text-[0.72rem] font-bold uppercase tracking-[0.14em] text-muted-foreground">Attendance</span>
+                      <strong className="text-ink-strong dark:text-foreground">{event.attendanceCounts.here} here now</strong>
+                    </div>
+                    </div>
+                  </Card>
+                  <Card className="mt-4 rounded-2xl" styles={{ body: { padding: 14 } }}>
+                    <div className="inline-flex items-center gap-2 mb-3.5 text-[0.98rem] font-extrabold text-ink-strong dark:text-foreground">
+                      <ShieldAlert size={16} />
+                      <span>Session setup</span>
+                    </div>
+                    <div className="flex flex-wrap gap-[10px]">
+                      {event.requiredEquipment.map((item) => (
+                        <Tag key={item} className="m-0 inline-flex items-center gap-1.5 rounded-full bg-white/70 px-3 py-1.5 text-[0.8rem] font-semibold text-ink-strong dark:bg-white/20">
+                          {item}
+                        </Tag>
+                      ))}
+                      {event.extraFacilities.map((item) => (
+                        <Tag key={item} className="m-0 inline-flex items-center gap-1.5 rounded-full bg-[rgba(255,205,137,0.22)] px-3 py-1.5 text-[0.8rem] font-semibold text-[#8d5f48] dark:bg-[rgba(255,224,181,0.58)] dark:text-[var(--accent-foreground)]">
+                          {item}
+                        </Tag>
+                      ))}
+                      {event.requiredEquipment.length === 0 && event.extraFacilities.length === 0 ? (
+                        <Typography.Text className="!text-sm !text-muted-foreground">
+                          No extra equipment or facilities listed.
+                        </Typography.Text>
+                      ) : null}
+                    </div>
+                  </Card>
+                </>
               ),
-            )}
-          </div>
-          <label className="switch-card">
-            <div>
-              <span className="field__label">Reminder</span>
-              <p className="field__hint">Mock local notification toggle for event start.</p>
-            </div>
-            <Switch
-              checked={reminderEnabled}
-              onCheckedChange={() => toggleReminder(event.id)}
-            />
-          </label>
-          <div className="button-row">
-            <Button className="primary-button" type="button" onClick={handleChatEntry}>
-              {isAttending ? 'Open chat' : 'Join session & chat'}
-            </Button>
-            {!isAttending ? (
-              <Button
-                variant="outline"
-                className="secondary-button"
-                type="button"
-                onClick={() => joinEvent(event.id)}
-              >
-                Join without chat
-              </Button>
-            ) : null}
-          </div>
-        </Card>
+            },
+            {
+              key: 'people',
+              label: <span data-testid="tab-people">People</span>,
+              children: (
+                <>
+                  <Card className="rounded-2xl" styles={{ body: { padding: 14 } }}>
+                    <div className="inline-flex items-center gap-2 mb-3.5 text-[0.98rem] font-extrabold text-ink-strong dark:text-foreground">
+                      <Users size={16} />
+                      <span>Who is coming</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      {participants.map((participant) => (
+                        <Button
+                          key={participant.id}
+                          type="default"
+                          className="!h-auto !min-h-[8.3rem] !w-full"
+                          htmlType="button"
+                          onClick={() => navigate(`/profile/${participant.id}`)}
+                        >
+                          <Avatar user={participant} size="lg" />
+                          <div className="flex min-h-[3.5rem] w-full flex-col items-center gap-1.5">
+                            <strong className="text-[1rem] leading-tight text-ink-strong dark:text-foreground">
+                              {participant.displayName}
+                            </strong>
+                            <span className="text-[0.9rem] leading-relaxed text-muted-foreground">
+                              {participant.id === host?.id
+                                ? 'Host'
+                                : ATTENDANCE_LABELS[event.attendanceStatuses[participant.id]]}
+                            </span>
+                          </div>
+                        </Button>
+                      ))}
+                    </div>
+                  </Card>
+                  {host ? (
+                    <Card className="mt-4 rounded-2xl" styles={{ body: { padding: 14 } }}>
+                      <div className="flex items-center gap-3">
+                      <Avatar user={host} />
+                      <div>
+                        <strong className="text-ink-strong dark:text-foreground">{host.displayName}</strong>
+                        <p className="mt-0.5 text-sm text-muted-foreground">
+                          {host.trustFlags.verifiedHost ? 'Verified host' : 'Standard host'} ·{' '}
+                          {host.trustFlags.noShowStrikes} no-show strike(s)
+                        </p>
+                      </div>
+                      </div>
+                    </Card>
+                  ) : null}
+                </>
+              ),
+            },
+            {
+              key: 'location',
+              label: (
+                <span data-testid="tab-location" className="inline-flex items-center gap-1.5">
+                  <MapPin size={14} />
+                  <span>Map</span>
+                </span>
+              ),
+              children: (
+                <Card className="rounded-2xl" styles={{ body: { padding: 14 } }}>
+                  <div className="inline-flex items-center gap-2 mb-3.5 text-[0.98rem] font-extrabold text-ink-strong dark:text-foreground">
+                    <MapPin size={16} />
+                    <span>Location</span>
+                  </div>
+                  <p className="mb-4 text-[0.88rem] leading-relaxed text-muted-foreground">{safeSafetyNote}</p>
+                  <EventMap
+                    compact
+                    events={[event]}
+                    selectedEventId={event.id}
+                    userLocation={userLocation}
+                    onSelectEvent={() => undefined}
+                  />
+                  <div className="mt-4 flex flex-wrap items-center gap-[10px]">
+                    <Tag className="m-0 inline-flex items-center gap-1.5 rounded-full bg-white/70 px-3 py-1.5 text-[0.8rem] font-semibold text-ink-strong dark:bg-white/20">
+                      {event.location.label}
+                    </Tag>
+                    <Button
+                      type="default"
+                      size="small"
+                      htmlType="button"
+                      onClick={() => navigate(`/discover?focus=${event.id}`)}
+                    >
+                      View on map
+                    </Button>
+                  </div>
+                </Card>
+              ),
+            },
+            {
+              key: 'chat',
+              label: (
+                <span data-testid="tab-chat" className="inline-flex items-center gap-1.5">
+                  <MessageCircle size={14} />
+                  <span>Chat</span>
+                </span>
+              ),
+              children: (
+                <Card className="rounded-2xl" styles={{ body: { padding: 14 } }}>
+                  {!isAttending ? (
+                    <div className="flex flex-col gap-4">
+                      <p className="text-[0.88rem] leading-relaxed text-muted-foreground">
+                        Join the session to access the group chat.
+                      </p>
+                      <Button className="w-full" htmlType="button" type="primary" onClick={handleChatEntry}>
+                        Join session & open chat
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-4">
+                      <div className="inline-flex items-center gap-2 text-[0.98rem] font-extrabold text-ink-strong dark:text-foreground">
+                        <Lock size={16} />
+                        <span>You're in!</span>
+                      </div>
+                      <div className="flex flex-wrap gap-[10px]">
+                        {(Object.entries(ATTENDANCE_LABELS) as Array<[AttendanceStatus, string]>).map(
+                          ([status, label]) => (
+                            <Button
+                              key={status}
+                              htmlType="button"
+                              type={currentStatus === status ? 'primary' : 'default'}
+                              size="small"
+                              className="rounded-full border border-transparent px-3 py-1.5 text-sm font-bold"
+                              onClick={() => handleAttendance(status)}
+                            >
+                              {label}
+                            </Button>
+                          ),
+                        )}
+                      </div>
+                      <label className="grid grid-cols-[1fr_auto] items-center gap-3 rounded-[20px] border border-[rgba(112,95,163,0.14)] bg-white/68 p-4 dark:bg-white/10">
+                        <div>
+                          <span className="block text-sm font-medium">Reminder</span>
+                          <p className="text-xs text-muted-foreground">Get notified when the session starts.</p>
+                        </div>
+                        <Switch
+                          checked={reminderEnabled}
+                          onChange={() => toggleReminder(event.id)}
+                        />
+                      </label>
+                      <Button
+                        htmlType="button"
+                        type="primary"
+                        onClick={handleChatEntry}
+                      >
+                        Open chat
+                      </Button>
+                    </div>
+                  )}
+                </Card>
+              ),
+            },
+          ]}
+        />
 
-        <Card>
-          <div className="section-title">
-            <ShieldAlert size={16} />
-            <span>Session setup</span>
-          </div>
-          <div className="chip-grid">
-            {event.requiredEquipment.map((item) => (
-              <Badge key={item} variant="outline" className="soft-badge">
-                {item}
-              </Badge>
-            ))}
-            {event.extraFacilities.map((item) => (
-              <Badge key={item} variant="secondary" className="soft-badge soft-badge--warm">
-                {item}
-              </Badge>
-            ))}
-          </div>
-          {host ? (
-            <div className="host-card">
-              <Avatar user={host} />
-              <div>
-                <strong>{host.displayName}</strong>
-                <p>
-                  {host.trustFlags.verifiedHost ? 'Verified host' : 'Standard host'} ·{' '}
-                  {host.trustFlags.noShowStrikes} no-show strike(s)
-                </p>
-              </div>
-            </div>
-          ) : null}
-          <div className="button-row">
+        <Card className="rounded-2xl" styles={{ body: { padding: 14 } }}>
+          <div className="flex flex-wrap gap-[10px]">
             <Button
-              variant="outline"
-              className="secondary-button"
-              type="button"
+              type="default"
+              htmlType="button"
               onClick={() =>
                 setReportTarget({ type: 'event', id: event.id, label: event.title })
               }
@@ -346,9 +422,8 @@ export function EventPage() {
             {host ? (
               <>
                 <Button
-                  variant="outline"
-                  className="secondary-button"
-                  type="button"
+                  type="default"
+                  htmlType="button"
                   onClick={() =>
                     setReportTarget({
                       type: 'user',
@@ -360,9 +435,8 @@ export function EventPage() {
                   Report host
                 </Button>
                 <Button
-                  variant="outline"
-                  className="secondary-button"
-                  type="button"
+                  danger
+                  htmlType="button"
                   onClick={() => blockUser(host.id)}
                 >
                   Block host
@@ -374,52 +448,37 @@ export function EventPage() {
 
         <Modal
           open={Boolean(reportTarget)}
+          onCancel={() => setReportTarget(null)}
+          onOk={handleSubmitReport}
           title={reportTarget ? `Report ${reportTarget.label}` : 'Report'}
-          description="This stays a frontend-only placeholder in the mock, but the flow is real."
-          onClose={() => setReportTarget(null)}
-          footer={
-            <>
-              <Button
-                variant="outline"
-                className="secondary-button"
-                type="button"
-                onClick={() => setReportTarget(null)}
-              >
-                Cancel
-              </Button>
-              <Button
-                className="primary-button primary-button--compact"
-                type="button"
-                onClick={handleSubmitReport}
-              >
-                Submit report
-              </Button>
-            </>
-          }
+          okText="Submit report"
+          cancelText="Cancel"
         >
-          <label className="field">
-            <span className="field__label">Reason</span>
-            <NativeSelect
-              value={reportReason}
-              onChange={(event) => setReportReason(event.target.value)}
-            >
-              {REPORT_REASONS.map((reason) => (
-                <NativeSelectOption key={reason} value={reason}>
-                  {reason}
-                </NativeSelectOption>
-              ))}
-            </NativeSelect>
-          </label>
-          <label className="field">
-            <span className="field__label">Notes</span>
-            <Textarea
-              className="text-field--textarea"
-              rows={4}
-              value={reportNotes}
-              onChange={(event) => setReportNotes(event.target.value)}
-              placeholder="What feels unsafe or fake?"
-            />
-          </label>
+          <p className="mb-4 text-sm text-muted-foreground">
+            This stays a frontend-only placeholder in the mock, but the flow is real.
+          </p>
+          <div className="flex flex-col gap-4">
+            <label className="field">
+              <span className="field__label">Reason</span>
+              <Select
+                value={reportReason}
+                onChange={(value) => setReportReason(value)}
+                options={REPORT_REASONS.map((reason) => ({
+                  value: reason,
+                  label: reason,
+                }))}
+              />
+            </label>
+            <label className="field">
+              <span className="field__label">Notes</span>
+              <Input.TextArea
+                rows={4}
+                value={reportNotes}
+                onChange={(event) => setReportNotes(event.target.value)}
+                placeholder="What feels unsafe or fake?"
+              />
+            </label>
+          </div>
         </Modal>
       </main>
     </AppFrame>
