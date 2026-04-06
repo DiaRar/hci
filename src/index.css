@@ -138,29 +138,97 @@ p { margin: 0; }
 
 /* Map */
 .event-map { width: 100%; height: 100%; }
-.leaflet-container { font-family: inherit; background: #edf1f6; }
-.leaflet-control-attribution { font-size: 10px; padding: 2px 6px; border-radius: 10px 0 0 0; background: rgba(255, 255, 255, 0.88); }
+.leaflet-container {
+  font-family: inherit;
+  background: #fff9f0;
+  border: 3px solid #2c2c2c;
+  box-shadow: 4px 4px 0 #2c2c2c;
+}
+.leaflet-tile-pane {
+  filter: saturate(0.62) contrast(1.08) brightness(1.01);
+}
+.leaflet-overlay-pane,
+.leaflet-marker-pane,
+.leaflet-tooltip-pane {
+  filter: none;
+}
+.leaflet-control-attribution {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 10px 0 0 0;
+  background: rgba(255, 255, 255, 0.9);
+  border-top: 2px solid #2c2c2c;
+  border-left: 2px solid #2c2c2c;
+}
+.leaflet-bar {
+  border: 3px solid #2c2c2c !important;
+  border-radius: 14px !important;
+  box-shadow: 4px 4px 0 #2c2c2c !important;
+  overflow: hidden;
+}
+.leaflet-bar a {
+  width: 34px !important;
+  height: 34px !important;
+  line-height: 30px !important;
+  font-weight: 700;
+  color: #2c2c2c !important;
+  background: #ffffff !important;
+  border-bottom: 3px solid #2c2c2c !important;
+}
+.leaflet-bar a:last-child {
+  border-bottom: 0 !important;
+}
+.leaflet-bar a:hover {
+  background: #f4ffe8 !important;
+}
 .bubble-map-pin { background: transparent !important; border: 0 !important; }
-.map-pin { position: relative; width: 58px; height: 58px; }
-.map-pin__glow { position: absolute; inset: 11px; border-radius: 999px; filter: blur(14px); opacity: 0.65; }
-.map-pin__core { position: absolute; inset: 5px; display: grid; place-items: center; border: 3px solid rgba(255, 255, 255, 0.96); border-radius: 999px; box-shadow: 0 16px 26px rgba(49, 38, 93, 0.16); }
-.map-pin__emoji { position: relative; z-index: 1; font-size: 1.32rem; }
-.map-pin__count { position: absolute; right: -1px; bottom: 1px; display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px; background: linear-gradient(135deg, var(--primary), var(--primary-strong)); color: white; font-size: 0.72rem; font-weight: 800; box-shadow: 0 10px 24px rgba(107, 92, 255, 0.28); }
-.map-pin--selected { transform: translateY(-5px) scale(1.08); }
-.map-pin--picker .map-pin__glow { background: rgba(228, 93, 56, 0.34); }
-.map-pin--picker .map-pin__core { background: linear-gradient(135deg, var(--primary), var(--primary-strong)); color: white; }
-.pin-tennis .map-pin__glow { background: rgba(122, 159, 47, 0.34); }
-.pin-tennis .map-pin__core { background: linear-gradient(135deg, #eef7bb, #9fca49); }
-.pin-padel .map-pin__glow { background: rgba(15, 141, 132, 0.34); }
-.pin-padel .map-pin__core { background: linear-gradient(135deg, #c8f2ee, #2cb6aa); }
-.pin-football .map-pin__glow { background: rgba(226, 163, 63, 0.36); }
-.pin-football .map-pin__core { background: linear-gradient(135deg, #ffe7ba, #f0ad46); }
-.pin-basketball .map-pin__glow { background: rgba(229, 109, 58, 0.34); }
-.pin-basketball .map-pin__core { background: linear-gradient(135deg, #ffd5c8, #ef844b); }
-.pin-running .map-pin__glow { background: rgba(95, 124, 255, 0.34); }
-.pin-running .map-pin__core { background: linear-gradient(135deg, #d6deff, #7f97ff); }
-.pin-training .map-pin__glow { background: rgba(63, 85, 103, 0.32); }
-.pin-training .map-pin__core { background: linear-gradient(135deg, #d2dbe3, #5c7385); }
+.map-pin { position: relative; width: 58px; height: 58px; --pin-accent: #52c41a; --pin-bg: rgba(255, 255, 255, 0.36); }
+.map-pin__glow { position: absolute; inset: 10px; border-radius: 999px; background: var(--pin-accent); filter: blur(13px); opacity: 0.22; }
+.map-pin__core {
+  position: absolute;
+  inset: 4px;
+  display: grid;
+  place-items: center;
+  border: 2.5px solid rgba(44, 44, 44, 0.9);
+  border-radius: 999px;
+  background: var(--pin-bg);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  box-shadow:
+    0 7px 18px rgba(44, 44, 44, 0.2),
+    inset 0 0 5px 2px rgba(255, 255, 255, 0.3),
+    inset 0 5px 2px rgba(255, 255, 255, 0.2);
+}
+.map-pin__emoji { position: relative; z-index: 1; font-size: 1.24rem; text-shadow: 0 1px rgba(255, 255, 255, 0.45); }
+.map-pin__count {
+  position: absolute;
+  right: -4px;
+  bottom: -2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: rgba(82, 196, 26, 0.88);
+  color: #ffffff;
+  border: 2px solid rgba(44, 44, 44, 0.88);
+  font-size: 0.7rem;
+  font-weight: 800;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 5px 14px rgba(44, 44, 44, 0.25);
+}
+.map-pin--selected { transform: translateY(-4px) scale(1.06); }
+.map-pin--selected .map-pin__core { box-shadow: 0 0 0 4px rgba(82, 196, 26, 0.2), 0 9px 22px rgba(44, 44, 44, 0.26), inset 0 0 5px 2px rgba(255, 255, 255, 0.32), inset 0 5px 2px rgba(255, 255, 255, 0.22); }
+.map-pin--picker { --pin-accent: rgba(82, 196, 26, 0.78); --pin-bg: rgba(239, 255, 219, 0.44); }
+.pin-tennis { --pin-accent: rgba(151, 207, 61, 0.82); --pin-bg: rgba(247, 255, 219, 0.42); }
+.pin-padel { --pin-accent: rgba(64, 201, 181, 0.82); --pin-bg: rgba(223, 248, 244, 0.42); }
+.pin-football { --pin-accent: rgba(255, 176, 84, 0.82); --pin-bg: rgba(255, 241, 217, 0.42); }
+.pin-basketball { --pin-accent: rgba(243, 133, 83, 0.82); --pin-bg: rgba(255, 229, 215, 0.42); }
+.pin-running { --pin-accent: rgba(131, 148, 255, 0.82); --pin-bg: rgba(230, 235, 255, 0.42); }
+.pin-training { --pin-accent: rgba(120, 142, 160, 0.82); --pin-bg: rgba(226, 232, 238, 0.42); }
 
 ::selection { background: rgba(107, 92, 255, 0.2); color: var(--ink-strong); }
 .scrollbar-thin { scrollbar-width: thin; scrollbar-color: rgba(107, 92, 255, 0.3) transparent; }
