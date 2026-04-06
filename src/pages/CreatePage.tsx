@@ -1,5 +1,5 @@
 import { MapPinned, Rocket, ShieldCheck } from 'lucide-react';
-import { useState, type Dispatch, type FormEvent, type SetStateAction } from 'react';
+import { useState, type Dispatch, type SetStateAction } from 'react';
 import { Alert, Button, Card, Checkbox, Input, Select, Steps, Switch, Tag, Typography } from 'antd';
 
 import { AppFrame, PageHeader } from '../components/AppFrame';
@@ -49,9 +49,7 @@ export function CreatePage() {
     );
   };
 
-  const handleSubmit = (submitEvent: FormEvent<HTMLFormElement>) => {
-    submitEvent.preventDefault();
-
+  const handleLaunchSession = () => {
     if (!title.trim() || !description.trim() || !startTime || !location.label.trim()) {
       setErrorMessage(
         'Title, description, start time, and location are required.',
@@ -110,7 +108,10 @@ export function CreatePage() {
           items={STEPS.map((label) => ({ title: label }))}
         />
 
-        <form className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pb-2" onSubmit={handleSubmit}>
+        <form
+          className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pb-2"
+          onSubmit={(event) => event.preventDefault()}
+        >
           {step === 0 && (
             <>
               <Card className="rounded-2xl" styles={{ body: { padding: 16 } }}>
@@ -388,8 +389,9 @@ export function CreatePage() {
             ) : (
               <Button
                 className="flex-1 !shadow-[4px_4px_0_#2C2C2C]"
-                htmlType="submit"
+                htmlType="button"
                 type="primary"
+                onClick={handleLaunchSession}
               >
                 Launch session
                 <Rocket size={16} />
