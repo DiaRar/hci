@@ -3,8 +3,6 @@ import {
   Clock3,
   Crosshair,
   MapPin,
-  MessageCircle,
-  Plus,
   SlidersHorizontal,
   Users,
 } from 'lucide-react';
@@ -95,8 +93,8 @@ export function DiscoverPage() {
     filteredEvents.find((event) => event.id === effectiveSelectedEventId) ?? null;
   const filterSummary =
     filters.category === 'all' ? 'All sports' : CATEGORY_META[filters.category].label;
-  const chatSendButtonStyle =
-    '!h-11 !w-11 !min-w-11 !rounded-full !p-0 !shadow-[4px_4px_0_#2C2C2C]';
+  const iconControlButtonStyle =
+    '!inline-flex !h-[52px] !w-[52px] !min-w-[52px] !items-center !justify-center !rounded-full !p-0 !shadow-[4px_4px_0_#2C2C2C]';
 
   const clearFilters = () => {
     setFilters(initialFilters);
@@ -128,35 +126,19 @@ export function DiscoverPage() {
 
           <div className="absolute left-0 right-0 top-0 z-[500] flex flex-col gap-3 p-4">
             <div className="flex items-center justify-between gap-2">
-              {currentUser ? (
-                <Button
-                  type="default"
-                  shape="circle"
-                  className={chatSendButtonStyle}
-                  htmlType="button"
-                  onClick={() => navigate('/profile/me')}
-                  aria-label="Open profile"
-                >
-                  <Avatar user={currentUser} size="md" />
-                </Button>
-              ) : (
-                <span className="h-11 w-11 rounded-full border border-border bg-[color:var(--surface-strong)]" />
-              )}
+              <span className="h-[52px] w-[52px]" aria-hidden="true" />
 
               <div className="inline-flex items-center gap-1.5 rounded-full bg-accent-purple px-3.5 py-2 text-[0.82rem] font-bold text-white shadow-[var(--shadow-soft)]">
                 Bubbleverse
               </div>
 
-              <Button
-                type="default"
-                shape="circle"
-                className={chatSendButtonStyle}
-                htmlType="button"
-                onClick={() => navigate('/chats')}
-                aria-label="Open chats"
-              >
-                <MessageCircle size={18} />
-              </Button>
+              {currentUser ? (
+                <span className="h-[52px] w-[52px] rounded-full border border-[rgba(44,44,44,0.14)] bg-white/65 p-2.5 shadow-[var(--shadow-soft)]">
+                  <Avatar user={currentUser} size="md" />
+                </span>
+              ) : (
+                <span className="h-[52px] w-[52px] rounded-full border border-border bg-[color:var(--surface-strong)]" />
+              )}
             </div>
 
             <div className="flex flex-col gap-2">
@@ -369,18 +351,9 @@ export function DiscoverPage() {
             className="absolute bottom-6 right-4 z-[600] flex flex-col gap-3"
           >
             <Button
-              type="primary"
-              shape="circle"
-              className="!inline-flex !h-14 !w-14 !min-w-14 !items-center !justify-center !rounded-full !p-0 !shadow-[4px_4px_0_#2C2C2C]"
-              htmlType="button"
-              onClick={() => navigate('/create')}
-              aria-label="Create event"
-              icon={<Plus size={26} />}
-            />
-            <Button
               type="default"
               shape="circle"
-              className="!inline-flex !h-[52px] !w-[52px] !min-w-[52px] !items-center !justify-center !rounded-full !p-0 !shadow-[4px_4px_0_#2C2C2C]"
+              className={iconControlButtonStyle}
               htmlType="button"
               onClick={() => setSelectedEventId(null)}
               aria-label="Clear selected session preview"

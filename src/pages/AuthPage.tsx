@@ -41,7 +41,7 @@ export function AuthPage() {
   };
 
   return (
-    <AppFrame>
+    <AppFrame showBottomNav={false}>
       <main className="flex flex-1 flex-col gap-4 overflow-y-auto p-5 pb-6">
         <Card className="relative overflow-hidden rounded-2xl" styles={{ body: { padding: 16 } }}>
           <div className="flex flex-wrap gap-[10px] mb-4">

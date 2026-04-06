@@ -2,14 +2,24 @@ import { ChevronLeft } from 'lucide-react';
 import { Button as AntButton } from 'antd';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import { BottomNav } from './BottomNav';
 
-export function AppFrame({ children }: { children: ReactNode }) {
+export function AppFrame({
+  children,
+  showBottomNav = true,
+}: {
+  children: ReactNode;
+  showBottomNav?: boolean;
+}) {
   return (
     <div className="page-scaffold">
       <div className="page-scaffold__orb page-scaffold__orb--left" />
       <div className="page-scaffold__orb page-scaffold__orb--right" />
       <div className="app-device">
-        <div className="app-device__screen">{children}</div>
+        <div className="app-device__screen">
+          <div className="app-device__content">{children}</div>
+          {showBottomNav ? <BottomNav /> : null}
+        </div>
       </div>
     </div>
   );
