@@ -56,17 +56,17 @@ export function EventMap({
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
         />
         <MapViewport center={center} compact={compact} />
         <CircleMarker
           center={[userLocation.lat, userLocation.lng]}
           radius={compact ? 8 : 10}
           pathOptions={{
-            color: '#e45d38',
-            fillColor: '#e45d38',
-            fillOpacity: 0.2,
-            weight: 2,
+            color: '#2C2C2C',
+            fillColor: '#52C41A',
+            fillOpacity: 0.24,
+            weight: 3,
           }}
         />
 
