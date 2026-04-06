@@ -22,7 +22,7 @@
  *   to demonstrate the trust system UI
  *
  * Geographic clustering:
- * - All events are clustered around TU Delft (51.9979, 4.3658) in Delft, Netherlands
+ * - All events are centered around X TU Delft (51.99935, 4.37344) in Delft, Netherlands
  * - This creates a realistic "nearby" discovery experience
  * - In production, you'd pull real venues from an API
  *
@@ -203,7 +203,7 @@ const users: User[] = [
  * - event-running: very early morning (hardcoded 7:15 AM)
  * - event-training: highest price, demonstration of equipment/facilities
  *
- * All events are within ~500m of each other (TU Delft campus)
+ * Events are spread across the broader TU Delft / X TU Delft area (~0.4-1.2km apart)
  */
 const events: Event[] = [
   {
@@ -215,9 +215,9 @@ const events: Event[] = [
     category: 'tennis',
     icon: CATEGORY_META.tennis.emoji,
     location: {
-      label: 'X TU Delft Outdoor Courts',
-      lat: 51.9978,
-      lng: 4.3654,
+      label: 'X TU Delft Outdoor Courts North',
+      lat: 52.00042,
+      lng: 4.37248,
     },
     // Today at 18:30 - good evening slot
     startTime: buildFutureDate(0, 18, 30),
@@ -254,8 +254,8 @@ const events: Event[] = [
     icon: CATEGORY_META.padel.emoji,
     location: {
       label: 'X TU Delft Padel Courts',
-      lat: 51.9975,
-      lng: 4.3658,
+      lat: 51.99868,
+      lng: 4.37512,
     },
     // Today at 17:45 - slightly earlier afternoon
     startTime: buildFutureDate(0, 17, 45),
@@ -289,9 +289,9 @@ const events: Event[] = [
     category: 'football',
     icon: CATEGORY_META.football.emoji,
     location: {
-      label: 'TU Delft Football Pitch',
-      lat: 51.9986,
-      lng: 4.3672,
+      label: 'X TU Delft Football Field',
+      lat: 51.99694,
+      lng: 4.37136,
     },
     // Tomorrow at 19:00 - evening slot next day
     startTime: buildFutureDate(1, 19, 0),
@@ -327,9 +327,9 @@ const events: Event[] = [
     category: 'basketball',
     icon: CATEGORY_META.basketball.emoji,
     location: {
-      label: 'X TU Delft Indoor Hall',
-      lat: 51.9982,
-      lng: 4.3664,
+      label: 'X TU Delft Indoor Hall East',
+      lat: 51.99786,
+      lng: 4.37466,
     },
     // Today at 20:00 - late evening
     startTime: buildFutureDate(0, 20, 0),
@@ -363,9 +363,9 @@ const events: Event[] = [
     category: 'running',
     icon: CATEGORY_META.running.emoji,
     location: {
-      label: 'Mekelpark South Start',
-      lat: 52.0008,
-      lng: 4.3708,
+      label: 'X TU Delft Mekelpark South Loop Start',
+      lat: 52.00218,
+      lng: 4.36982,
     },
     // Today at 07:15 - early morning run (hardcoded for demo variety)
     startTime: buildFutureDate(0, 7, 15),
@@ -401,9 +401,9 @@ const events: Event[] = [
     category: 'training',
     icon: CATEGORY_META.training.emoji,
     location: {
-      label: 'X TU Delft Gym Floor',
-      lat: 51.9977,
-      lng: 4.3661,
+      label: 'X TU Delft Gym Floor West',
+      lat: 51.99572,
+      lng: 4.37608,
     },
     // Tomorrow at 18:15 - early evening tomorrow
     startTime: buildFutureDate(1, 18, 15),
@@ -512,7 +512,7 @@ const messages: Message[] = [
  * Default values:
  * - currentUserId: null (no one logged in)
  * - lastCreatedEventId: null (no events created yet)
- * - userLocation: TU Delft campus (realistic demo location)
+ * - userLocation: X TU Delft center (realistic demo location)
  * - reports: empty array (no safety reports yet)
  */
 export const initialBubbleState: BubbleState = {
@@ -521,8 +521,8 @@ export const initialBubbleState: BubbleState = {
   // Mock user location - in production would use navigator.geolocation
   userLocation: {
     label: 'X TU Delft',
-    lat: 51.9979,
-    lng: 4.3658,
+    lat: 51.99935,
+    lng: 4.37344,
   },
   users,
   events,
