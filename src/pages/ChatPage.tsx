@@ -100,7 +100,7 @@ export function ChatPage() {
         <PageHeader
           title={chatTitle}
           subtitle={`${event.attendeeIds.length} ${attendeeLabel}`}
-          backTo={`/event/${event.id}`}
+          backTo="/chats"
         />
 
         {!isAttending ? (
