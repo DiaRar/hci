@@ -50,7 +50,7 @@ export function ChatPage() {
 
   if (!event) {
     return (
-      <AppFrame>
+      <AppFrame showBottomNav={false}>
         <main className="flex-1 flex flex-col gap-4 p-5 pb-8">
           <PageHeader
             title="Chat unavailable"
@@ -94,12 +94,12 @@ export function ChatPage() {
   };
 
   return (
-    <AppFrame>
+    <AppFrame showBottomNav={false}>
       <main className="flex-1 flex flex-col gap-4 p-5 pb-8 min-h-0">
         <PageHeader
           title={chatTitle}
           subtitle={`${event.attendeeIds.length} ${attendeeLabel}`}
-          backTo={`/event/${event.id}`}
+          backTo={`/chats`}
         />
 
         {!isAttending ? (

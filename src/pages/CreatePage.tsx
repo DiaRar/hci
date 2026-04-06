@@ -95,11 +95,10 @@ export function CreatePage() {
 
   return (
     <AppFrame>
-      <main className="flex min-h-0 flex-1 flex-col gap-4 p-5 pb-8">
+      <main className="flex min-h-0 flex-1 flex-col gap-4 p-5 pb-3">
         <PageHeader
           title="Create session"
           subtitle={`Step ${step + 1} of ${STEPS.length}`}
-          backTo="/discover"
         />
 
         <Steps
@@ -109,7 +108,7 @@ export function CreatePage() {
         />
 
         <form
-          className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pb-2"
+          className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto"
           onSubmit={(event) => event.preventDefault()}
         >
           {step === 0 && (

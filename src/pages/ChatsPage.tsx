@@ -65,7 +65,6 @@ export function ChatsPage() {
         <PageHeader
           title="Chats"
           subtitle="Jump into any session conversation."
-          backTo="/discover"
         />
 
         {myEvents.length === 0 ? (

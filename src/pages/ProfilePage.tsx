@@ -122,7 +122,7 @@ export function ProfilePage() {
               ? 'Edit how you appear in the app and manage your mock GDPR actions.'
               : `See who ${profile.displayName} is before you join their session.`
           }
-          backTo="/discover"
+          backTo={isOwnProfile ? undefined : '/discover'}
         />
 
         <Card className="rounded-2xl" styles={{ body: { padding: 16 } }}>
