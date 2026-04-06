@@ -32,6 +32,9 @@ export function EventMap({
   const selectedEvent = events.find((event) => event.id === selectedEventId);
   const center = pickerLocation ?? selectedEvent?.location ?? userLocation;
   const centerPoint: [number, number] = [center.lat, center.lng];
+  const scrollWheelZoomEnabled =
+    typeof window !== 'undefined' &&
+    window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
   return (
     <div
@@ -48,7 +51,7 @@ export function EventMap({
         center={centerPoint}
         zoom={14}
         className="event-map"
-        scrollWheelZoom={false}
+        scrollWheelZoom={scrollWheelZoomEnabled}
         zoomControl={showZoomControl}
       >
         <TileLayer
