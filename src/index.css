@@ -54,10 +54,20 @@
     linear-gradient(180deg, rgba(255, 255, 255, 0.84) 0%, rgba(246, 242, 255, 0.88) 100%);
   --phone-width: 430px;
   --phone-height: 932px;
+  --app-vh: 100dvh;
+}
+
+@supports not (height: 100dvh) {
+  :root {
+    --app-vh: 100vh;
+  }
 }
 
 *,*::before,*::after { box-sizing: border-box; }
-html,body,#root { min-height: 100%; }
+html, body, #root {
+  width: 100%;
+  min-height: 100%;
+}
 body {
   margin: 0;
   font-family: 'Space Grotesk', sans-serif;
@@ -66,6 +76,7 @@ body {
     radial-gradient(circle at top right, rgba(121, 105, 245, 0.18), transparent 24%),
     radial-gradient(circle at 50% 120%, rgba(88, 204, 102, 0.12), transparent 34%),
     linear-gradient(180deg, #fdf4ea 0%, #f7f2ff 52%, #eef8f2 100%);
+  overflow: hidden;
 }
 button,input,textarea,select { font: inherit; }
 button { cursor: pointer; }
@@ -87,7 +98,7 @@ p { margin: 0; }
   display: flex;
   justify-content: center;
   width: 100%;
-  min-height: 100vh;
+  min-height: var(--app-vh);
   padding: 24px 12px 42px;
   overflow: hidden;
 }
@@ -104,8 +115,9 @@ p { margin: 0; }
 .app-device {
   position: relative;
   width: min(var(--phone-width), 100%);
-  height: min(calc(100vh - 48px), var(--phone-height));
-  min-height: min(calc(100vh - 48px), var(--phone-height));
+  height: min(calc(var(--app-vh) - 48px), var(--phone-height));
+  min-height: min(calc(var(--app-vh) - 48px), var(--phone-height));
+  max-height: min(calc(var(--app-vh) - 48px), var(--phone-height));
   border: 1px solid rgba(255, 255, 255, 0.88);
   border-radius: 36px;
   background: rgba(255, 255, 255, 0.5);
@@ -265,6 +277,16 @@ p { margin: 0; }
 
 @media (max-width: 480px) {
   .page-scaffold { padding: 0; }
-  .app-device { min-height: 100vh; border-radius: 0; border: 0; width: 100%; }
-  .app-device__screen { min-height: 100vh; }
+  .app-device {
+    width: 100%;
+    height: var(--app-vh);
+    min-height: var(--app-vh);
+    max-height: var(--app-vh);
+    border-radius: 0;
+    border: 0;
+  }
+  .app-device__screen {
+    height: 100%;
+    min-height: 0;
+  }
 }
