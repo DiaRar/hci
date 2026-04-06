@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { Button, Card, Input, Modal, Select, Switch, Tabs, Tag, Typography } from 'antd';
 import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { AppFrame, PageHeader } from '../components/AppFrame';
 import { Avatar } from '../components/Avatar';
 import { EventMap } from '../components/EventMap';
@@ -20,6 +20,7 @@ import {
   REPORT_REASONS,
 } from '../lib/constants';
 import { formatCurrency, formatEventWindow } from '../lib/format';
+import { useAnimatedNavigate } from '../lib/useAnimatedNavigate';
 import { useBubbleStore } from '../store/BubbleStore';
 import type { AttendanceStatus, ReportTargetType } from '../types';
 
@@ -34,7 +35,7 @@ function isReadableText(value: string): boolean {
 }
 
 export function EventPage() {
-  const navigate = useNavigate();
+  const navigate = useAnimatedNavigate();
   const { eventId } = useParams();
   const {
     currentUser,

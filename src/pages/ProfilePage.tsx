@@ -1,12 +1,13 @@
 import { Download, LogOut, ShieldAlert, ShieldCheck, Trash2, UserPlus } from 'lucide-react';
 import { Button, Card, Checkbox, Input, Modal, Select, Switch, Tag, Typography } from 'antd';
 import { useState, type FormEvent } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 import { AppFrame, PageHeader } from '../components/AppFrame';
 import { Avatar } from '../components/Avatar';
 import { CATEGORY_META, REPORT_REASONS } from '../lib/constants';
 import { formatCurrency, formatEventWindow } from '../lib/format';
+import { useAnimatedNavigate } from '../lib/useAnimatedNavigate';
 import { useBubbleStore } from '../store/BubbleStore';
 import type { Event, ProfilePatch, ReportTargetType, User } from '../types';
 
@@ -21,7 +22,7 @@ function isReadableTitle(title: string): boolean {
 }
 
 export function ProfilePage() {
-  const navigate = useNavigate();
+  const navigate = useAnimatedNavigate();
   const { userId } = useParams();
   const {
     currentUser,

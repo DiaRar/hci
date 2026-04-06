@@ -1,6 +1,5 @@
 import { Clock3, Flag, Gauge, MapPin, ShieldAlert, Users } from 'lucide-react';
 import { Card, Flex, Tag, Typography } from 'antd';
-import { Link } from 'react-router-dom';
 
 import { cn } from '@/lib/utils';
 
@@ -13,6 +12,7 @@ import {
   formatEventWindow,
 } from '../lib/format';
 import { useBubbleStore } from '../store/BubbleStore';
+import { AnimatedLink } from './AnimatedLink';
 import { AvatarStack } from './Avatar';
 import type { Event } from '../types';
 
@@ -34,7 +34,7 @@ export function EventCard({ event, selected = false }: EventCardProps) {
     : undefined;
 
   return (
-    <Link className="block" to={`/event/${event.id}`} data-testid="event-card">
+    <AnimatedLink className="block" to={`/event/${event.id}`} data-testid="event-card">
       <Card
         className={cn(
           'flex flex-col gap-[14px] rounded-2xl bg-card p-4',
@@ -138,6 +138,6 @@ export function EventCard({ event, selected = false }: EventCardProps) {
           </div>
         </div>
       </Card>
-    </Link>
+    </AnimatedLink>
   );
 }

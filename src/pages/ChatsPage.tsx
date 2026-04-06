@@ -1,9 +1,9 @@
 import { MessageCircle } from 'lucide-react';
 import { Button, Card, Tag, Typography } from 'antd';
-import { useNavigate } from 'react-router-dom';
 
 import { CATEGORY_META } from '@/lib/constants';
 import { formatClock } from '@/lib/format';
+import { useAnimatedNavigate } from '@/lib/useAnimatedNavigate';
 import { AppFrame, PageHeader } from '../components/AppFrame';
 import { AvatarStack } from '../components/Avatar';
 import { useBubbleStore } from '../store/BubbleStore';
@@ -29,7 +29,7 @@ function formatPlayerLabel(count: number): string {
 }
 
 export function ChatsPage() {
-  const navigate = useNavigate();
+  const navigate = useAnimatedNavigate();
   const { currentUser, events, users, messages } = useBubbleStore();
 
   const joinedEvents = events.filter(

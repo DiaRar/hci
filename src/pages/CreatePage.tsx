@@ -1,6 +1,5 @@
 import { MapPinned, Rocket, ShieldCheck } from 'lucide-react';
 import { useState, type Dispatch, type FormEvent, type SetStateAction } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Alert, Button, Card, Checkbox, Input, Select, Steps, Switch, Tag, Typography } from 'antd';
 
 import { AppFrame, PageHeader } from '../components/AppFrame';
@@ -12,13 +11,14 @@ import {
   SKILL_LEVELS,
 } from '../lib/constants';
 import { toLocalDateTimeInputValue } from '../lib/format';
+import { useAnimatedNavigate } from '../lib/useAnimatedNavigate';
 import { useBubbleStore } from '../store/BubbleStore';
 import type { CategoryId, EventLocation, SkillLevel } from '../types';
 
 const STEPS = ['Sport', 'Details', 'Location', 'Review'];
 
 export function CreatePage() {
-  const navigate = useNavigate();
+  const navigate = useAnimatedNavigate();
   const { createEvent, events, userLocation } = useBubbleStore();
   const [step, setStep] = useState(0);
   const [category, setCategory] = useState<CategoryId>('tennis');

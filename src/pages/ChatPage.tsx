@@ -1,9 +1,10 @@
 import { Flag, SendHorizontal, UserPlus } from 'lucide-react';
 import { Button, Card, Input, Modal, Select } from 'antd';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 import { cn } from '@/lib/utils';
+import { useAnimatedNavigate } from '@/lib/useAnimatedNavigate';
 
 import { AppFrame, PageHeader } from '../components/AppFrame';
 import { Avatar } from '../components/Avatar';
@@ -12,7 +13,7 @@ import { REPORT_REASONS } from '../lib/constants';
 import { useBubbleStore } from '../store/BubbleStore';
 
 export function ChatPage() {
-  const navigate = useNavigate();
+  const navigate = useAnimatedNavigate();
   const { eventId } = useParams();
   const {
     currentUser,

@@ -10,12 +10,13 @@ import {
 } from 'lucide-react';
 import { Button, Card, Select, Tag } from 'antd';
 import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 import { AppFrame } from '../components/AppFrame';
 import { Avatar } from '../components/Avatar';
 import { EventMap } from '../components/EventMap';
 import { CATEGORY_META } from '../lib/constants';
+import { useAnimatedNavigate } from '../lib/useAnimatedNavigate';
 import {
   computeDistanceKm,
   formatClock,
@@ -44,7 +45,7 @@ function hasReadableText(value: string): boolean {
 }
 
 export function DiscoverPage() {
-  const navigate = useNavigate();
+  const navigate = useAnimatedNavigate();
   const [searchParams] = useSearchParams();
   const { currentUser, events, userLocation } = useBubbleStore();
   const [filters, setFilters] = useState<DiscoverFilters>(initialFilters);

@@ -1,7 +1,7 @@
 import { ChevronLeft } from 'lucide-react';
 import { Button as AntButton } from 'antd';
 import type { ReactNode } from 'react';
-import { Link } from 'react-router-dom';
+import { AnimatedLink } from './AnimatedLink';
 
 export function AppFrame({ children }: { children: ReactNode }) {
   return (
@@ -27,13 +27,13 @@ export function PageHeader({ title, subtitle, backTo, action }: PageHeaderProps)
     <header className="flex items-center justify-between gap-3 pb-1">
       <div className="flex-1 flex items-center gap-3">
         {backTo ? (
-          <Link
+          <AnimatedLink
             className="shrink-0"
             to={backTo}
-            aria-label="Go back"
+            ariaLabel="Go back"
           >
             <AntButton shape="circle" icon={<ChevronLeft size={18} />} />
-          </Link>
+          </AnimatedLink>
         ) : (
           <span className="h-10 w-10 shrink-0" aria-hidden="true" />
         )}

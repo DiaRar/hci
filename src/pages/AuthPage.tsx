@@ -1,15 +1,15 @@
 import { ArrowRight, Compass, Shield, UserRound } from 'lucide-react';
 import { Button, Card, Input, Switch, Tag, Typography } from 'antd';
 import { useEffect, useState, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import { AppFrame } from '../components/AppFrame';
 import { Avatar } from '../components/Avatar';
 import { HERO_TAGLINES, HIGHLIGHT_BADGES, INTEREST_OPTIONS } from '../lib/constants';
+import { useAnimatedNavigate } from '../lib/useAnimatedNavigate';
 import { useBubbleStore } from '../store/BubbleStore';
 
 export function AuthPage() {
-  const navigate = useNavigate();
+  const navigate = useAnimatedNavigate();
   const { authenticate, currentUser, users } = useBubbleStore();
   const [displayName, setDisplayName] = useState('');
   const [nearbyDiscoveryEnabled, setNearbyDiscoveryEnabled] = useState(true);
